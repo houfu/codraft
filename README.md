@@ -15,6 +15,22 @@ Two template formats are supported:
 - **`.docx`** — rendered via `docxtpl`, produces a Word document
 - **`.html`** — rendered via `jinja2`, produces both an HTML file and a PDF (via `weasyprint`)
 
+## Installation
+
+### Prerequisites
+
+You'll need a [Claude Cowork](https://claude.ai) account.
+
+### Download Codraft
+
+1. On the Codraft GitHub page, click the green **Code** button, then click **Download ZIP**
+2. Extract the ZIP file to a folder of your choice (e.g., your Documents folder)
+
+### Open in Cowork
+
+1. Open Claude Cowork and add the extracted folder as a project
+2. That's it — Python dependencies are installed automatically the first time you use the skill
+
 ## Quick Start
 
 ### 1. Add a template
