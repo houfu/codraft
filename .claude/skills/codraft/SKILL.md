@@ -34,82 +34,15 @@ uv pip install docxtpl pyyaml jinja2 weasyprint --break-system-packages
 
 ---
 
-## Phase 2 — Analyze Template (Variable Extraction)
+## Phase 2 — Analyze Template
 
-Once a template is selected, extract its variables. This phase produces or loads a `manifest.yaml`.
+Once a template is selected, run the **codraft-analyzer** skill on the template directory. It will:
+- Detect the template format (docx or html)
+- Check for a cached manifest
+- Extract variables and infer types
+- Save or reuse `manifest.yaml`
 
-### Detect template format
-
-1. Look for a `.docx` or `.html` file in the template directory.
-2. Each directory should contain exactly one template file. If multiple are found, use the first and warn.
-3. The file extension determines the format (`docx` or `html`), which is recorded in the manifest.
-
-### Check for cached manifest
-
-1. Look for `manifest.yaml` in the template's directory.
-2. If it exists and the template file has NOT been modified since the manifest was generated (compare `analyzed_at` timestamp with template file modification time), use the cached manifest. Skip to Phase 3.
-3. If no manifest exists, or the template is newer, run the analysis below.
-
-### Extract variables
-
-**For docx templates:** Run a Python script using `docxtpl` and `re` to:
-
-1. Load the template with `docxtpl.DocxTemplate`.
-2. Scan all text content — paragraphs, tables, headers, footers — for the pattern `\{\{\s*(\w+)\s*\}\}`.
-
-**For HTML templates:** Run a Python script using `re` to:
-
-1. Read the raw HTML file as text.
-2. Scan for the same pattern: `\{\{\s*(\w+)\s*\}\}`.
-
-**For both formats**, then:
-
-3. Collect unique variable names, preserving first-occurrence order.
-4. For each variable, infer type from its name suffix:
-
-| Suffix pattern | Inferred type |
-|---|---|
-| `*_name`, `*_address` | `text` |
-| `*_date` | `date` |
-| `*_email` | `email` |
-| `*_amount`, `*_price`, `*_fee` | `number` |
-| `*_phone`, `*_tel`, `*_mobile` | `phone` |
-| Everything else | `text` |
-
-5. Generate a human-readable label from the variable name: replace underscores with spaces, title-case it (e.g., `landlord_name` → "Landlord Name").
-6. Save `manifest.yaml` in the template directory with this structure:
-
-```yaml
-template: "<filename>.docx"
-template_path: "templates/<template_name>/<filename>.docx"
-format: docx
-analyzed_at: "<ISO 8601 timestamp>"
-variable_count: <N>
-
-variables:
-
-  - name: landlord_name
-    label: Landlord Name
-    type: text
-
-  - name: commencement_date
-    label: Commencement Date
-    type: date
-
-  - name: rental_amount
-    label: Rental Amount
-    type: number
-```
-
-The `format` field is `docx` or `html`. Each variable is its own YAML block, separated by a blank line for readability. This structure is designed to be extended later with fields like `default`, `question`, and `validation`.
-
-### Edge cases
-
-- **docx-specific**: Variables inside tables, headers, and footers must be found.
-- Malformed placeholders (e.g., `{{name}` with missing brace) — skip and warn the user.
-- Empty template (no variables) — inform the user and stop.
-- Multiple template files in one directory — use the first, warn about others.
-- No `.docx` or `.html` file found — inform the user and stop.
+Load the resulting `manifest.yaml` and proceed.
 
 ---
 
@@ -170,127 +103,27 @@ Execute the interview plan:
 
 ---
 
-## Phase 6 — Render
+## Phase 6 — Render and Validate
 
-Once confirmed, render the document. The process differs by template format.
+Once confirmed, run the **codraft-renderer** skill with:
+- The template path
+- The format (docx or html)
+- The complete variable dictionary
+- The output directory (`output/`)
 
-### Output structure
+The renderer will:
+1. Render the document (docx, or html + pdf)
+2. Validate the output for any unfilled `{{ }}` placeholders
+3. Return the output path(s) and validation status
 
-Each rendering job gets its own folder inside `output/`:
-
-```
-output/
-└── nda_acme_pte_ltd_2026-02-15/
-    └── nda_acme_pte_ltd_2026-02-15.docx
-
-output/
-└── invoice_acme_2026-02-15/
-    ├── invoice_acme_2026-02-15.html
-    └── invoice_acme_2026-02-15.pdf
-```
-
-The job folder and filenames follow the pattern `{template_name}_{key_variable}_{date}`:
-- `key_variable` is the most identifying variable (typically a person/company name) — slugified (lowercase, underscores, no special characters).
-- `date` is today's date in `YYYY-MM-DD` format.
-
-### Docx rendering
-
-```python
-from docxtpl import DocxTemplate
-import os
-from datetime import date
-
-template_path = "<path to template docx>"
-output_dir = "<path to output/>"
-
-doc = DocxTemplate(template_path)
-context = {
-    # all variable_name: value pairs
-}
-doc.render(context)
-
-# Build job folder and filename
-key_var = context.get("<most_identifying_variable>", "document")
-slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
-job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
-
-output_path = os.path.join(job_dir, f"{job_name}.docx")
-doc.save(output_path)
-print(f"Saved: {output_path}")
-```
-
-### HTML rendering
-
-```python
-from jinja2 import Template
-import weasyprint
-import os
-from datetime import date
-
-template_path = "<path to template html>"
-output_dir = "<path to output/>"
-
-with open(template_path) as f:
-    template = Template(f.read())
-
-context = {
-    # all variable_name: value pairs
-}
-rendered_html = template.render(context)
-
-# Build job folder and filename
-key_var = context.get("<most_identifying_variable>", "document")
-slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
-job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
-
-# Save rendered HTML
-html_path = os.path.join(job_dir, f"{job_name}.html")
-with open(html_path, "w") as f:
-    f.write(rendered_html)
-print(f"Saved HTML: {html_path}")
-
-# Convert to PDF
-pdf_path = os.path.join(job_dir, f"{job_name}.pdf")
-weasyprint.HTML(filename=html_path).write_pdf(pdf_path)
-print(f"Saved PDF: {pdf_path}")
-```
-
-### Edge cases
-- All variables in the manifest MUST have values — never render with blanks.
-- If a value is missing, go back to the interview loop for that variable.
+If validation **fails** (unfilled placeholders found):
+- Report the issue to the user
+- Offer to re-collect the missing values and re-render
+- Do NOT deliver a document with unfilled placeholders
 
 ---
 
-## Phase 7 — Validate Rendered Document
-
-After rendering, scan the output as a sanity check to confirm all placeholders were filled.
-
-### For docx output
-
-1. Open the rendered docx with `python-docx`.
-2. Scan all text content — paragraphs, tables, headers, footers — for any remaining `{{ ... }}` placeholders using the same regex from the Analyzer: `\{\{\s*(\w+)\s*\}\}`.
-
-### For HTML output
-
-1. Read the rendered HTML file as text.
-2. Scan for any remaining `{{ ... }}` placeholders using the same regex. Do this on the rendered HTML **before** or **after** PDF conversion (the HTML is the source of truth).
-
-### For both formats
-
-3. If **no placeholders remain**: validation passes. Proceed to Phase 8.
-4. If **unfilled placeholders are found**:
-   - List the variable names that were not replaced.
-   - Check whether those variables exist in the manifest — if they do, something went wrong in rendering; if they don't, the template may have placeholders the Analyzer missed (e.g., in docx, inside complex formatting runs that split the `{{ }}` tokens across multiple XML elements).
-   - Report the issue to the user and offer to re-collect the missing values and re-render.
-   - Do NOT deliver a document with unfilled placeholders.
-
----
-
-## Phase 8 — Post-Render
+## Phase 7 — Post-Render
 
 1. Present the completed document(s) to the user with links to the job folder.
    - For docx: link to the `.docx` file.
