@@ -1,0 +1,183 @@
+# ── Template metadata ─────────────────────────────────────
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement with optional IP assignment and milestone tracking"
+  category: "contracts"
+
+# ── Variable overrides ────────────────────────────────────
+# Keys are variable names from the template.
+# Any field here overrides the Analyzer's auto-inferred values.
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name as it should appear in the agreement?"
+    description: "The legal entity or individual name of the client"
+    default: ""
+    required: true
+    format_hint: "Full legal name as registered"
+
+  client_address:
+    label: "Client Address"
+    question: "What is the client's full address?"
+    description: "Street address, city, state/province, postal code, country"
+    required: true
+
+  client_email:
+    label: "Client Email"
+    question: "What is the client's email address?"
+    description: "For official correspondence"
+    required: true
+    format_hint: "user@company.com"
+
+  consultant_name:
+    label: "Consultant Name"
+    question: "What is the consultant's full name?"
+    description: "The individual providing consulting services"
+    required: true
+
+  consultant_address:
+    label: "Consultant Address"
+    question: "What is the consultant's full address?"
+    description: "Street address, city, state/province, postal code, country"
+    required: true
+
+  consultant_email:
+    label: "Consultant Email"
+    question: "What is the consultant's email address?"
+    description: "For official correspondence"
+    required: true
+    format_hint: "user@company.com"
+
+  effective_date:
+    question: "When should this agreement take effect?"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  scope_of_services:
+    label: "Scope of Services"
+    question: "What consulting services will be provided?"
+    description: "Detailed description of the services to be provided"
+    required: true
+
+  total_fee:
+    label: "Total Fee"
+    question: "What is the total fee for the consulting services?"
+    description: "The agreed-upon total compensation"
+    required: true
+    format_hint: "Amount in USD, no currency symbol"
+
+  payment_terms:
+    label: "Payment Terms"
+    question: "What are the payment terms?"
+    description: "How and when payments should be made"
+    required: true
+
+  payment_method:
+    type: choice
+    choices:
+      - bank_transfer
+      - cheque
+      - crypto
+    question: "How will the consultant be paid?"
+    default: "bank_transfer"
+
+  include_ip_assignment:
+    type: boolean
+    question: "Does this engagement involve intellectual property that should be assigned to the client?"
+    default: false
+
+  ip_ownership_entity:
+    label: "IP Ownership Entity"
+    question: "Which entity should own the intellectual property?"
+    description: "The legal entity that will own the IP created"
+    required: true
+
+  ip_assignment_date:
+    question: "When should the IP assignment take effect?"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  governing_law:
+    question: "Which jurisdiction's laws govern this agreement?"
+    description: "The legal jurisdiction that will govern interpretation and enforcement"
+    default: "Singapore"
+
+  arbitration_body:
+    question: "Which arbitration body will handle disputes?"
+    description: "The arbitration organization for dispute resolution"
+    default: "Singapore International Arbitration Centre (SIAC)"
+
+  client_signature_date:
+    question: "What date will the client sign this agreement?"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  consultant_signature_date:
+    question: "What date will the consultant sign this agreement?"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  # Bank details (conditional on payment_method == 'bank_transfer')
+  bank_name:
+    label: "Bank Name"
+    question: "What is the name of the bank?"
+    description: "Full name of the bank where payments should be made"
+    required: true
+
+  account_name:
+    label: "Account Name"
+    question: "What is the account name?"
+    description: "The account holder's name"
+    required: true
+
+  account_number:
+    label: "Account Number"
+    question: "What is the account number?"
+    description: "The bank account number for transfers"
+    required: true
+
+  swift_code:
+    label: "SWIFT/BIC Code"
+    question: "What is the SWIFT/BIC code?"
+    description: "The bank's SWIFT/BIC code for international transfers"
+    required: true
+
+  # Check payment (conditional on payment_method == 'check')
+  check_payable_to:
+    label: "Check Payable To"
+    question: "To whom should checks be made payable?"
+    description: "The entity name that should appear on checks"
+    required: true
+
+# ── Interview groups ──────────────────────────────────────
+# Overrides the Orchestrator's auto-grouping.
+# Each group defines which variables are asked together.
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address, client_email, consultant_name, consultant_address, consultant_email]
+
+  - name: "Engagement Terms"
+    variables: [effective_date, scope_of_services, total_fee, payment_terms, payment_method]
+
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+
+  - name: "Bank Details"
+    condition: "payment_method == 'bank_transfer'"
+    variables: [bank_name, account_name, account_number, swift_code]
+
+  - name: "Legal Terms"
+    variables: [governing_law, arbitration_body]
+
+  - name: "Signatures"
+    variables: [client_signature_date, consultant_signature_date]
+
+# ── Cross-field validation ────────────────────────────────
+# Evaluated during the Confirmation phase after all values are collected.
+# Rules are simple comparisons the Orchestrator can evaluate.
+validation:
+  - rule: "client_signature_date > effective_date"
+    message: "The client signature date must be on or after the effective date"
+  - rule: "consultant_signature_date > effective_date"
+    message: "The consultant signature date must be on or after the effective date"
