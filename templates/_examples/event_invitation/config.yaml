@@ -96,13 +96,16 @@ groups:
 
   - name: "Guest List"
     loop: guests
-    variables: [name, email, phone, guests, dietary_requirements]
+    variables: [name, email, phone, num_guests]
+
+  - name: "Dietary Requirements"
+    condition: include_dietary_section
+    loop: guests
+    variables: [dietary_requirements]
 
 # ── Cross-field validation ────────────────────────────────
 # Evaluated during the Confirmation phase after all values are collected.
 # Rules are simple comparisons the Orchestrator can evaluate.
 validation:
-  - rule: "rsvp_date > event_date"
-    message: "The RSVP deadline must be on or before the event date"
-  - rule: "event_time > event_time"
-    message: "The event start time must be a valid time"
+  - rule: "rsvp_date < event_date"
+    message: "The RSVP deadline must be before the event date"

@@ -19,7 +19,8 @@ This template demonstrates all v2 features of Codraft:
 ### 3. Loops
 - **Guest List** (`{% for guest in guests %}`)
   - Collects a list of guests
-  - Each guest has: `name`, `email`, `phone`, `guests`, `dietary_requirements`
+  - Each guest has: `name`, `email`, `phone`, `num_guests`
+  - `dietary_requirements` is collected per guest only when `include_dietary_section` is true
   - Renders as a table with guest details
 
 ### 4. Developer Configuration (`config.yaml`)
@@ -51,8 +52,8 @@ event_invitation/
 1. **Event Details** — Collect event name, date, time, location, description
 2. **Host Information** — Collect host name and address
 3. **RSVP Information** — Collect RSVP deadline, email, phone
-4. **Guest List** (loop) — Collect multiple guests with name, email, phone, guests, dietary requirements
-5. **Dietary Requirements** (conditional) — Only asked if `include_dietary_section` is true
+4. **Guest List** (loop) — Collect multiple guests with name, email, phone, num_guests
+5. **Dietary Requirements** (conditional loop) — Collect dietary_requirements per guest, only if `include_dietary_section` is true
 
 ## Validation Rules
 

@@ -142,11 +142,11 @@ variables:
     description: "The bank's SWIFT/BIC code for international transfers"
     required: true
 
-  # Check payment (conditional on payment_method == 'check')
+  # Cheque payment (conditional on payment_method == 'cheque')
   check_payable_to:
-    label: "Check Payable To"
-    question: "To whom should checks be made payable?"
-    description: "The entity name that should appear on checks"
+    label: "Cheque Payable To"
+    question: "To whom should cheques be made payable?"
+    description: "The entity name that should appear on cheques"
     required: true
 
 # ── Interview groups ──────────────────────────────────────
@@ -167,11 +167,19 @@ groups:
     condition: "payment_method == 'bank_transfer'"
     variables: [bank_name, account_name, account_number, swift_code]
 
+  - name: "Cheque Payment"
+    condition: "payment_method == 'cheque'"
+    variables: [check_payable_to]
+
   - name: "Legal Terms"
     variables: [governing_law, arbitration_body]
 
   - name: "Signatures"
     variables: [client_signature_date, consultant_signature_date]
+
+  - name: "Project Milestones"
+    loop: milestones
+    variables: [name, description, due_date]
 
 # ── Cross-field validation ────────────────────────────────
 # Evaluated during the Confirmation phase after all values are collected.

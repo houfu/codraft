@@ -1,15 +1,17 @@
 ---
 name: codraft
-description: "Document assembly tool. Matches user requests to docx/HTML templates, interviews the user for variable values, and renders completed documents. Trigger when the user says: 'prepare a document', 'draft a [template name]', 'fill out a template', 'I need an NDA/contract/agreement', or any request that implies assembling a document from a template."
+description: "Document assembly tool. Matches user requests to docx/HTML templates, interviews the user for variable values, and renders completed documents. Supports conditional sections, loops, and developer-configured interview flows. Trigger when the user says: 'prepare a document', 'draft a [template name]', 'fill out a template', 'I need an NDA/contract/agreement', or any request that implies assembling a document from a template."
 ---
 
-# Codraft — Document Assembly Orchestrator
+# Codraft — Document Assembly Orchestrator (v2)
 
-You are running the Codraft document assembly skill. Your job is to guide the user through preparing a document from a template: discover the right template, extract its variables, interview the user conversationally, and render the final output.
+You are running the Codraft document assembly skill. Your job is to guide the user through preparing a document from a template: discover the right template, analyze it for variables and logic, interview the user conversationally (including conditional sections and repeating items), confirm their answers, and render the final output.
 
 Templates can be either `.docx` or `.html` files. The pipeline adapts based on the template format:
-- **docx** → rendered via `docxtpl` → produces a `.docx`
-- **html** → rendered via `jinja2` → produces a `.html` + `.pdf` (via `weasyprint`)
+- **docx** -> rendered via `docxtpl` -> produces a `.docx`
+- **html** -> rendered via `jinja2` -> produces a `.html` + `.pdf` (via `weasyprint`)
+
+v2 templates may contain conditional sections (`{% if %}` / `{% else %}`) and loops (`{% for %}`). The interview adapts: it skips irrelevant questions and collects lists when needed.
 
 ## Prerequisites
 
@@ -26,271 +28,261 @@ uv pip install docxtpl pyyaml jinja2 weasyprint --break-system-packages
 1. List all template directories. Templates can live in two places:
    - `templates/` — user templates (gitignored, not committed to the repo)
    - `templates/_examples/` — bundled example templates (tracked in git)
-2. Scan both locations. Each subdirectory name is a template identifier. For `_examples/`, the identifier is the subdirectory name within it (e.g., `templates/_examples/nda/` → identifier is `nda`).
-3. If the user's request clearly maps to a template (e.g., "prepare an NDA" → `nda/`), select it automatically and tell the user which template you're using.
+2. Scan both locations. Each subdirectory name is a template identifier. For `_examples/`, the identifier is the subdirectory name within it (e.g., `templates/_examples/nda/` -> identifier is `nda`).
+3. If the user's request clearly maps to a template (e.g., "prepare an NDA" -> `nda/`), select it automatically and tell the user which template you're using.
 4. If ambiguous or no match, present all available templates (from both locations) and ask the user to choose.
-5. Matching should be fuzzy and reasonable — "tenancy" matches `tenancy_agreement/`, "employment" matches `employment_contract/`.
+5. Matching should be fuzzy and reasonable — "tenancy" matches `tenancy_agreement/`, "consulting" matches `consulting_agreement/`.
 6. If the same template name exists in both locations, prefer the user's copy in `templates/` over the one in `_examples/`.
+7. If the template has `meta.display_name` in its manifest, use that when presenting to the user.
 
 ---
 
-## Phase 2 — Analyze Template (Variable Extraction)
+## Phase 2 — Analyze Template
 
-Once a template is selected, extract its variables. This phase produces or loads a `manifest.yaml`.
+Once a template is selected, run the **codraft-analyzer** skill on the template directory. It will:
+- Detect the template format (docx or html)
+- Check for a cached manifest (regenerate if template is newer or manifest is v1)
+- Extract variables from `{{ }}` placeholders
+- Detect conditional blocks (`{% if %}` / `{% else %}` / `{% endif %}`)
+- Detect loop blocks (`{% for %}` / `{% endfor %}`)
+- Merge overrides from `config.yaml` if present
+- Save or reuse `manifest.yaml`
 
-### Detect template format
+Load the resulting `manifest.yaml` and proceed. The manifest is the single source of truth for the interview — you never read `config.yaml` directly.
 
-1. Look for a `.docx` or `.html` file in the template directory.
-2. Each directory should contain exactly one template file. If multiple are found, use the first and warn.
-3. The file extension determines the format (`docx` or `html`), which is recorded in the manifest.
+### Understanding the Manifest
 
-### Check for cached manifest
+The v2 manifest contains:
 
-1. Look for `manifest.yaml` in the template's directory.
-2. If it exists and the template file has NOT been modified since the manifest was generated (compare `analyzed_at` timestamp with template file modification time), use the cached manifest. Skip to Phase 3.
-3. If no manifest exists, or the template is newer, run the analysis below.
-
-### Extract variables
-
-**For docx templates:** Run a Python script using `docxtpl` and `re` to:
-
-1. Load the template with `docxtpl.DocxTemplate`.
-2. Scan all text content — paragraphs, tables, headers, footers — for the pattern `\{\{\s*(\w+)\s*\}\}`.
-
-**For HTML templates:** Run a Python script using `re` to:
-
-1. Read the raw HTML file as text.
-2. Scan for the same pattern: `\{\{\s*(\w+)\s*\}\}`.
-
-**For both formats**, then:
-
-3. Collect unique variable names, preserving first-occurrence order.
-4. For each variable, infer type from its name suffix:
-
-| Suffix pattern | Inferred type |
-|---|---|
-| `*_name`, `*_address` | `text` |
-| `*_date` | `date` |
-| `*_email` | `email` |
-| `*_amount`, `*_price`, `*_fee` | `number` |
-| `*_phone`, `*_tel`, `*_mobile` | `phone` |
-| Everything else | `text` |
-
-5. Generate a human-readable label from the variable name: replace underscores with spaces, title-case it (e.g., `landlord_name` → "Landlord Name").
-6. Save `manifest.yaml` in the template directory with this structure:
-
-```yaml
-template: "<filename>.docx"
-template_path: "templates/<template_name>/<filename>.docx"
-format: docx
-analyzed_at: "<ISO 8601 timestamp>"
-variable_count: <N>
-
-variables:
-
-  - name: landlord_name
-    label: Landlord Name
-    type: text
-
-  - name: commencement_date
-    label: Commencement Date
-    type: date
-
-  - name: rental_amount
-    label: Rental Amount
-    type: number
-```
-
-The `format` field is `docx` or `html`. Each variable is its own YAML block, separated by a blank line for readability. This structure is designed to be extended later with fields like `default`, `question`, and `validation`.
-
-### Edge cases
-
-- **docx-specific**: Variables inside tables, headers, and footers must be found.
-- Malformed placeholders (e.g., `{{name}` with missing brace) — skip and warn the user.
-- Empty template (no variables) — inform the user and stop.
-- Multiple template files in one directory — use the first, warn about others.
-- No `.docx` or `.html` file found — inform the user and stop.
+- **`schema_version`**: Always `2`. If you encounter a manifest without this field, re-run the analyzer.
+- **`variables`**: Unconditional variables — always collected during the interview.
+- **`conditionals`**: Variables gated by `{% if %}` / `{% else %}` blocks. Each entry has:
+  - `condition`: The condition expression (e.g., `"include_ip_assignment"` or `"payment_method == 'bank_transfer'"`)
+  - `gate_type`: `"boolean"` (truthiness) or `"equality"` (value match)
+  - `gate_variable`: For equality conditions, which variable to check
+  - `gate_value`: For equality conditions, what value triggers the if-branch
+  - `if_variables`: Variables to collect when the condition is true
+  - `else_variables`: Variables to collect when the condition is false
+- **`loops`**: Repeating sections. Each entry has:
+  - `collection`: The collection variable name (e.g., `"milestones"`)
+  - `loop_var`: The iteration alias (e.g., `"milestone"`)
+  - `label`: Human-readable label for the loop
+  - `min_items`: Minimum items required (default 1)
+  - `variables`: Sub-variables per item
+- **`dependencies`**: Map of gate variable -> list of dependent variable names. Used for quick lookups.
+- **`groups`**: Optional interview structure from `config.yaml`. If present, use it. If absent, auto-group.
+- **`validation`**: Optional cross-field validation rules.
+- **`meta`**: Optional display name, description, category.
 
 ---
 
 ## Phase 3 — Interview Plan (Internal)
 
-Before asking any questions, create an internal interview plan. Do NOT show this plan to the user — it's your reasoning step to ensure the interview feels natural.
+Before asking any questions, create an internal interview plan. Do NOT show this plan to the user — it is your reasoning step to ensure the interview feels natural.
 
-Examine the full variable manifest and the template name/context, then decide:
+### Step 3a — Check for Groups
 
-### Grouping
-Which variables belong together? Group by logical affinity, not document order:
-- All details about the same party together (e.g., landlord name + address + email)
-- All financial terms together (rent, deposit, fees)
-- All dates together if related (start date, end date)
+Read the manifest's `groups` section.
 
-### Ordering
-Follow natural conversational flow:
-1. Parties first (who is involved?)
-2. Subject matter (what is this about?)
-3. Terms and conditions (financial, dates, obligations)
-4. Administrative details last (governing law, notice addresses)
+**If `groups` is present** (provided by the template developer via `config.yaml`):
+- Use the groups as-is for your interview structure.
+- Each group specifies its variables and may have:
+  - `condition`: A conditional gate (the group is only asked if the condition is met)
+  - `loop`: A loop collection name (the group collects a list of items)
+- Ensure gate variables are asked before the groups they gate. Gate variables may appear in an earlier unconditional group.
 
-### Question phrasing
+**If `groups` is absent**, auto-group:
+1. Separate unconditional variables into logical groups by affinity (same as v1):
+   - Party details together (names, addresses, emails of the same entity)
+   - Financial terms together
+   - Related dates together
+2. Identify gate variables (from `dependencies`) and ensure they are placed in groups that come **before** their dependent conditional groups.
+3. Create one group per conditional block containing its `if_variables` (and `else_variables` if any).
+4. Create one group per loop block, placed last.
+
+### Step 3b — Determine Group Order
+
+Order the groups for a natural conversational flow:
+
+1. **Unconditional groups** first — parties, subject matter, terms, administrative details
+2. **Conditional groups** interleaved after their gate variables have been collected
+3. **Loop groups** last — these collect lists and are naturally the final step
+
+### Step 3c — Plan Questions
+
 For each group, draft natural questions:
-- Consider the document type for context (a tenancy agreement vs an NDA frames questions differently)
-- Add format guidance where relevant (e.g., "in DD/MM/YYYY format", "in SGD")
-- Don't just say "What is the [label]?" — be conversational
+- If the manifest provides a `question` for a variable, use it.
+- Otherwise, consider the document type for context and phrase conversationally.
+- For `choice` type variables: present the available options from `choices`.
+- For `boolean` type variables: phrase as a yes/no question.
+- For `date` type variables: include format guidance if `format_hint` is provided.
+- For variables with a `default` value: mention the default (e.g., "When should this take effect? (defaults to today)").
+- Add format guidance from `format_hint` where available.
 
-If available, use the AskUserQuestion.
+If available, use the AskUserQuestion tool.
 
 ---
 
 ## Phase 4 — Interview Loop
 
-Execute the interview plan:
+Execute the interview plan, group by group.
 
-1. Present one group at a time with your drafted question.
-2. Parse the user's answers and map them to the correct variables within the group.
+### 4a — Unconditional Groups
+
+For each unconditional group:
+1. Present the group with your drafted question(s).
+2. Parse the user's answers and map them to the correct variables.
 3. Validate based on type:
+   - `text` — any non-empty string
    - `date` — looks like a date in any reasonable format
    - `number` — is numeric (may include currency symbols, commas)
    - `email` — has basic email format (contains @)
    - `phone` — looks like a phone number
-   - `text` — any non-empty string
-4. If validation fails, ask again with clear guidance on what's expected.
-5. If the user gives a partial answer (e.g., name but not address), acknowledge what you received and ask for the missing fields.
-6. Store all answers in a dictionary mapping variable names to values.
-7. Continue until all groups are complete.
+   - `boolean` — yes/no, true/false, or similar affirmative/negative
+   - `choice` — matches one of the values in `choices`
+4. If validation fails, ask again with clear guidance.
+5. If the user gives a partial answer, acknowledge what you received and ask for the missing fields.
+6. If a variable has a `default` and the user doesn't provide a value, use the default. Special default `"today"` resolves to the current date.
+7. Store answers in the variable dictionary.
 
----
+### 4b — Conditional Groups
 
-## Phase 5 — Confirmation
+After collecting a gate variable's value, evaluate the condition:
 
-1. Present a clear summary of ALL collected values, organised by the interview groups.
-2. Ask the user to confirm or correct any values.
-3. If corrections are needed, update the values and re-display the summary.
-4. Do not proceed to rendering until the user confirms.
+**Boolean gate** (`gate_type: boolean`):
+- `true` if the user answered yes/affirmative/true
+- `false` otherwise
 
----
+**Equality gate** (`gate_type: equality`):
+- `true` if the collected value of `gate_variable` equals `gate_value`
+- `false` otherwise
 
-## Phase 6 — Render
+Then:
+1. If condition is **true**: present the `if_variables` group and collect answers.
+2. If condition is **false** and `else_variables` is non-empty: present the `else_variables` group and collect answers.
+3. If condition is **false** and `else_variables` is empty: skip. Inform the user naturally (e.g., "Since you chose cheque, we'll skip the bank details section.").
 
-Once confirmed, render the document. The process differs by template format.
+When introducing a conditional group, provide context: "Since you indicated IP should be assigned, I'll need a few more details about that."
 
-### Output structure
+### 4c — Loop Groups
 
-Each rendering job gets its own folder inside `output/`:
+For each loop group:
+
+1. **Introduce**: Tell the user what you're collecting and that you'll ask one item at a time.
+   - Example: "Now let's add the project milestones. I'll ask for each one individually."
+2. **Collect first item**: Ask for all sub-variables as a group.
+   - Example: "What's the description, due date, and amount for the first milestone?"
+3. **Confirm the item**: Summarize what you captured.
+   - Example: "Got it -- Milestone 1: 'Design phase', due 15 March 2026, $5,000."
+4. **Prompt for more**: "Would you like to add another milestone?"
+5. **Repeat** steps 2-4 for each additional item the user wants to add.
+6. **Minimum check**: Ensure at least `min_items` (default 1) items are collected. If the user tries to stop before reaching the minimum, inform them: "At least [N] milestone(s) required. Let's add one more."
+7. **Summary**: After the user finishes, summarize all items.
+   - Example: "I have 3 milestones recorded: [numbered list]"
+
+Store the collected data as a list of dictionaries under the collection name:
 
 ```
-output/
-└── nda_acme_pte_ltd_2026-02-15/
-    └── nda_acme_pte_ltd_2026-02-15.docx
-
-output/
-└── invoice_acme_2026-02-15/
-    ├── invoice_acme_2026-02-15.html
-    └── invoice_acme_2026-02-15.pdf
-```
-
-The job folder and filenames follow the pattern `{template_name}_{key_variable}_{date}`:
-- `key_variable` is the most identifying variable (typically a person/company name) — slugified (lowercase, underscores, no special characters).
-- `date` is today's date in `YYYY-MM-DD` format.
-
-### Docx rendering
-
-```python
-from docxtpl import DocxTemplate
-import os
-from datetime import date
-
-template_path = "<path to template docx>"
-output_dir = "<path to output/>"
-
-doc = DocxTemplate(template_path)
-context = {
-    # all variable_name: value pairs
+{
+    "milestones": [
+        {"description": "Design phase", "date": "2026-03-15", "amount": "5000"},
+        {"description": "Development", "date": "2026-04-30", "amount": "10000"}
+    ]
 }
-doc.render(context)
-
-# Build job folder and filename
-key_var = context.get("<most_identifying_variable>", "document")
-slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
-job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
-
-output_path = os.path.join(job_dir, f"{job_name}.docx")
-doc.save(output_path)
-print(f"Saved: {output_path}")
 ```
 
-### HTML rendering
+### 4d — Value Storage
 
-```python
-from jinja2 import Template
-import weasyprint
-import os
-from datetime import date
-
-template_path = "<path to template html>"
-output_dir = "<path to output/>"
-
-with open(template_path) as f:
-    template = Template(f.read())
-
-context = {
-    # all variable_name: value pairs
-}
-rendered_html = template.render(context)
-
-# Build job folder and filename
-key_var = context.get("<most_identifying_variable>", "document")
-slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
-job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
-
-# Save rendered HTML
-html_path = os.path.join(job_dir, f"{job_name}.html")
-with open(html_path, "w") as f:
-    f.write(rendered_html)
-print(f"Saved HTML: {html_path}")
-
-# Convert to PDF
-pdf_path = os.path.join(job_dir, f"{job_name}.pdf")
-weasyprint.HTML(filename=html_path).write_pdf(pdf_path)
-print(f"Saved PDF: {pdf_path}")
-```
-
-### Edge cases
-- All variables in the manifest MUST have values — never render with blanks.
-- If a value is missing, go back to the interview loop for that variable.
+Maintain a single variable dictionary throughout the interview. It contains:
+- Flat key-value pairs for unconditional and conditional variables
+- List-of-dicts values for loop collections
+- Boolean variables stored as `true`/`false` (not "yes"/"no" strings)
 
 ---
 
-## Phase 7 — Validate Rendered Document
+## Phase 5 — Confirmation and Validation
 
-After rendering, scan the output as a sanity check to confirm all placeholders were filled.
+### 5a — Summary Display
 
-### For docx output
+Present a clear summary of ALL collected values, organized by groups:
 
-1. Open the rendered docx with `python-docx`.
-2. Scan all text content — paragraphs, tables, headers, footers — for any remaining `{{ ... }}` placeholders using the same regex from the Analyzer: `\{\{\s*(\w+)\s*\}\}`.
+1. **Unconditional groups**: Show values as before.
+2. **Conditional sections**: Show with gate status:
+   - If the condition was **true** (section included): display the collected values under the group heading.
+   - If the condition was **false** (section skipped): show the group name with "*Skipped (not applicable)*".
+3. **Loop items**: Show as a numbered list under the group heading.
 
-### For HTML output
+Example:
 
-1. Read the rendered HTML file as text.
-2. Scan for any remaining `{{ ... }}` placeholders using the same regex. Do this on the rendered HTML **before** or **after** PDF conversion (the HTML is the source of truth).
+```
+Parties:
+- Client: TechCorp Pte Ltd, 1 Raffles Place, Singapore 048616
+- Consultant: Sarah Chen, 88 Telok Ayer Street, Singapore 048468
 
-### For both formats
+Engagement Terms:
+- Effective Date: 01/03/2026
+- Scope: Full-stack web application development
+- Payment Method: Bank transfer
 
-3. If **no placeholders remain**: validation passes. Proceed to Phase 8.
-4. If **unfilled placeholders are found**:
-   - List the variable names that were not replaced.
-   - Check whether those variables exist in the manifest — if they do, something went wrong in rendering; if they don't, the template may have placeholders the Analyzer missed (e.g., in docx, inside complex formatting runs that split the `{{ }}` tokens across multiple XML elements).
-   - Report the issue to the user and offer to re-collect the missing values and re-render.
-   - Do NOT deliver a document with unfilled placeholders.
+Bank Details:
+- Bank: DBS Bank
+- Account: 012-345678-9
+
+IP Assignment: *Skipped (not applicable)*
+
+Milestones:
+1. Design phase -- 15 March 2026 -- $5,000
+2. Development phase -- 30 April 2026 -- $10,000
+```
+
+### 5b — Validation Rules
+
+If the manifest includes `validation` rules, evaluate them after presenting the summary:
+
+1. Parse each rule (e.g., `"end_date > effective_date"`).
+2. Compare the collected values accordingly (dates compared chronologically, numbers numerically).
+3. If any rule fails, report the error message from the manifest and ask the user to correct the relevant values.
+4. Re-validate after corrections.
+5. Do not proceed to rendering until all rules pass.
+
+### 5c — User Edits
+
+Ask the user to confirm or correct any values. The user can:
+
+- **Edit any individual value**: Update it in the dictionary.
+- **Change a gate answer**: This reveals or hides dependent sections.
+  - If changing from false to true: ask the newly-required conditional questions before re-confirming.
+  - If changing from true to false: remove the previously-collected conditional values and mark the section as skipped.
+  - If changing a choice value that gates a conditional: re-evaluate which conditional sections apply.
+- **Add loop items**: Re-enter the loop collection flow, appending to the existing list.
+- **Edit a loop item**: Ask which item number to edit, then ask for updated values.
+- **Remove a loop item**: Ask which item number to remove. Enforce `min_items` after removal.
+
+After any edits, re-display the updated summary and re-validate. Continue until the user confirms.
 
 ---
 
-## Phase 8 — Post-Render
+## Phase 6 — Render and Validate
+
+Once confirmed, run the **codraft-renderer** skill with:
+- The template path
+- The format (docx or html)
+- The complete variable dictionary (including boolean values as Python `True`/`False` and loop data as lists of dicts)
+- The output directory (`output/`)
+
+The renderer will:
+1. Render the document (docx, or html + pdf)
+2. Validate the output for any unfilled `{{ }}` placeholders or unrendered `{% %}` control tags
+3. Return the output path(s) and validation status
+
+If validation **fails** (unfilled placeholders or unrendered tags found):
+- Report the issue to the user
+- Offer to re-collect the missing values and re-render
+- Do NOT deliver a document with unfilled placeholders
+
+---
+
+## Phase 7 — Post-Render
 
 1. Present the completed document(s) to the user with links to the job folder.
    - For docx: link to the `.docx` file.
@@ -306,5 +298,6 @@ After rendering, scan the output as a sanity check to confirm all placeholders w
 - **For HTML templates**, use `jinja2.Template` for rendering and `weasyprint` for PDF conversion.
 - **Use `uv`** for Python package management.
 - **Format any Python code** in the style of black.
-- **The manifest is a cache** — regenerate it if the template file is newer, otherwise reuse it.
-- You assist with legal workflows but do not provide legal advice. All analysis should be reviewed by qualified legal professionals before being relied upon. Offer to read the documents, but remind the user to seek advice.
+- **The manifest is a cache** — regenerate it if the template file is newer or if `schema_version` is missing/less than 2.
+- **Boolean coercion** — when passing data to the renderer, ensure boolean variables are Python `True`/`False`, not strings like `"yes"` or `"no"`.
+- You assist with legal workflows but do not provide legal advice. All documents should be reviewed by qualified legal professionals before being relied upon. Offer to read the documents, but remind the user to seek advice.
