@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read release manifest
+        id: manifest
+        run: |
+          echo "files=$(cat release-manifest.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Build release ZIP
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          ZIP_NAME="codraft-v${VERSION}.zip"
+          # Read manifest and zip only listed files/dirs
+          while IFS= read -r line || [[ -n "$line" ]]; do
+            [ -z "$line" ] && continue
+            [ "${line:0:1}" = "#" ] && continue
+            FILES="$FILES $line"
+          done < release-manifest.txt
+          zip -r "$ZIP_NAME" $FILES
+          echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_NAME }}
+          generate_release_notes: true

@@ -1,0 +1,29 @@
+name: Simple text substitution
+description: >
+  All variables are plain text fields. Verifies basic
+  placeholder replacement in an HTML template.
+
+template: simple_text/simple_text.html
+
+variables:
+  party_name: "Acme Pte Ltd"
+  counterparty_name: "Beta Corp"
+  governing_law: "Singapore"
+
+expected_output: simple_text/output.html
+
+checks:
+  - type: contains_text
+    value: "Acme Pte Ltd"
+  - type: contains_text
+    value: "Beta Corp"
+  - type: contains_text
+    value: "Singapore"
+  - type: not_contains_text
+    value: "{{ party_name }}"
+  - type: not_contains_text
+    value: "{{ counterparty_name }}"
+  - type: not_contains_text
+    value: "{{ governing_law }}"
+  - type: file_exists
+    path: simple_text/output.html

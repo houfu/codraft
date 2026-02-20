@@ -1,0 +1,82 @@
+---
+title: Template Authoring
+description: How to write Codraft templates with variables, conditionals, and loops
+---
+
+## Placeholders
+
+Use Jinja2-style double-brace syntax in both `.docx` and `.html` templates:
+
+```
+This Agreement is entered into by {{ disclosing_party_name }}
+(the "Disclosing Party") with address at {{ disclosing_party_address }}.
+```
+
+## Conditional Sections
+
+Use `{% if %}` / `{% else %}` / `{% endif %}` to include or exclude sections:
+
+```
+{% if include_warranty %}
+The Seller warrants that the goods are free from defects.
+{% else %}
+The goods are sold "as is" without warranty.
+{% endif %}
+```
+
+Two condition forms are supported:
+- **Truthiness:** `{% if variable_name %}` — variable is truthy (boolean true, non-empty)
+- **Equality:** `{% if variable_name == 'value' %}` — variable equals a specific string
+
+## Loop Sections
+
+Use `{% for %}` / `{% endfor %}` for repeating sections:
+
+```
+{% for service in services %}
+Service: {{ service.description }}
+Fee: {{ service.fee }}
+{% endfor %}
+```
+
+Inside the loop body, reference sub-variables with dot notation: `{{ loop_var.sub_variable }}`.
+
+## Developer Configuration
+
+Add an optional `config.yaml` alongside your template to customise the interview:
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name?"
+    required: true
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: "bank_transfer"
+
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address]
+  - name: "Milestones"
+    loop: milestones
+    variables: [description, date, amount]
+
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date"
+```
+
+## Rules
+
+- One template file per directory (`.docx` or `.html`, not both)
+- Use `{{ }}` with spaces around the variable name: `{{ name }}` not `{{name}}`
+- Variable names must be valid Python identifiers: lowercase, underscores, no spaces
+- The same variable can appear multiple times — it will be filled with one value
+- Single-level nesting only: no `{% for %}` inside `{% if %}`, or vice versa
+- `{% elif %}` is not supported (use separate `{% if %}` blocks instead)

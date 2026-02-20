@@ -1,0 +1,35 @@
+name: All field types
+description: >
+  One variable of each inferred type (name, date, email, amount, phone).
+  Verifies that all type suffixes render correctly.
+
+template: all_field_types/all_field_types.html
+
+variables:
+  person_name: "Jane Smith"
+  effective_date: "2026-02-20"
+  contact_email: "jane@example.com"
+  payment_amount: "5000.00"
+  contact_phone: "+65 9123 4567"
+
+expected_output: all_field_types/output.html
+
+checks:
+  - type: contains_text
+    value: "Jane Smith"
+  - type: contains_text
+    value: "2026-02-20"
+  - type: contains_text
+    value: "jane@example.com"
+  - type: contains_text
+    value: "5000.00"
+  - type: contains_text
+    value: "+65 9123 4567"
+  - type: not_contains_text
+    value: "{{ person_name }}"
+  - type: not_contains_text
+    value: "{{ effective_date }}"
+  - type: not_contains_text
+    value: "{{ contact_email }}"
+  - type: file_exists
+    path: all_field_types/output.html

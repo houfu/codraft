@@ -1,0 +1,111 @@
+# ── Template metadata ─────────────────────────────────────
+meta:
+  display_name: "Event Invitation"
+  description: "Professional event invitation with guest list management and optional dietary requirements"
+  category: "invitations"
+
+# ── Variable overrides ────────────────────────────────────
+# Keys are variable names from the template.
+# Any field here overrides the Analyzer's auto-inferred values.
+variables:
+  event_name:
+    label: "Event Name"
+    question: "What is the name of the event?"
+    description: "The official name of the event"
+    required: true
+
+  event_date:
+    question: "What is the date of the event?"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  event_time:
+    question: "What time does the event start?"
+    description: "Start time of the event"
+    required: true
+    format_hint: "HH:MM"
+
+  event_location:
+    label: "Event Location"
+    question: "What is the name of the venue?"
+    description: "The venue or location name"
+    required: true
+
+  event_address:
+    label: "Venue Address"
+    question: "What is the full address of the venue?"
+    description: "Street address, city, state/province, postal code, country"
+    required: true
+
+  event_description:
+    label: "Event Description"
+    question: "Please provide a brief description of the event"
+    description: "What the event is about and what attendees can expect"
+    required: true
+
+  host_name:
+    label: "Host Name"
+    question: "Who is hosting the event?"
+    description: "The name of the person or organization hosting"
+    required: true
+
+  host_address:
+    label: "Host Address"
+    question: "What is the host's address?"
+    description: "Street address, city, state/province, postal code, country"
+    required: true
+
+  rsvp_date:
+    question: "What is the RSVP deadline?"
+    description: "The date by which guests should respond"
+    default: "today"
+    format_hint: "DD/MM/YYYY"
+
+  rsvp_email:
+    label: "RSVP Email"
+    question: "What email should guests use to RSVP?"
+    description: "Email address for RSVP responses"
+    required: true
+    format_hint: "rsvp@company.com"
+
+  rsvp_phone:
+    label: "RSVP Phone"
+    question: "What phone number should guests call to RSVP?"
+    description: "Phone number for RSVP responses"
+    required: true
+    format_hint: "+65 1234 5678"
+
+  include_dietary_section:
+    type: boolean
+    question: "Should we include a dietary requirements section?"
+    description: "Include a section for guests to specify dietary needs"
+    default: true
+
+# ── Interview groups ──────────────────────────────────────
+# Overrides the Orchestrator's auto-grouping.
+# Each group defines which variables are asked together.
+groups:
+  - name: "Event Details"
+    variables: [event_name, event_date, event_time, event_location, event_address, event_description]
+
+  - name: "Host Information"
+    variables: [host_name, host_address]
+
+  - name: "RSVP Information"
+    variables: [rsvp_date, rsvp_email, rsvp_phone]
+
+  - name: "Guest List"
+    loop: guests
+    variables: [name, email, phone, num_guests]
+
+  - name: "Dietary Requirements"
+    condition: include_dietary_section
+    loop: guests
+    variables: [dietary_requirements]
+
+# ── Cross-field validation ────────────────────────────────
+# Evaluated during the Confirmation phase after all values are collected.
+# Rules are simple comparisons the Orchestrator can evaluate.
+validation:
+  - rule: "rsvp_date < event_date"
+    message: "The RSVP deadline must be before the event date"

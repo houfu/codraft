@@ -6,74 +6,210 @@ Codraft is a document assembly tool built as Claude Cowork skills. It replaces t
 
 1. User asks to prepare a document (e.g., "prepare an NDA")
 2. Claude matches the request to a template in `templates/`
-3. The template is analyzed for `{{ variable_name }}` placeholders
-4. Claude interviews the user conversationally, grouping related fields
-5. Once confirmed, the template is rendered and saved to a job folder in `output/`
+3. The Analyzer skill parses the template for `{{ variable_name }}` placeholders, `{% if %}` conditionals, and `{% for %}` loops, producing a `manifest.yaml`
+4. If a `config.yaml` is present, the Analyzer merges developer overrides (custom questions, groups, validation) into the manifest
+5. Claude interviews the user conversationally, grouping related fields, skipping irrelevant conditional sections, and collecting loop items with an "add another?" flow
+6. Once confirmed, the Renderer skill renders the template and saves it to a job folder in `output/`
 
 Templates can be `.docx` or `.html`:
-- **docx** → rendered via `docxtpl` → produces `.docx`
-- **html** → rendered via `jinja2` → produces `.html` + `.pdf` (via `weasyprint`)
+- **docx** — rendered via `docxtpl` — produces `.docx`
+- **html** — rendered via `jinja2` — produces `.html` + `.pdf` (via `weasyprint`)
 
 ## Project Structure
 
 ```
 codraft/
-├── CLAUDE.md              # This file — project-level instructions
-├── README.md              # Project documentation
-├── codraft_mvp_spec.md    # Full MVP specification
-├── LICENSE                # MIT License
+├── CLAUDE.md                         # This file — project-level instructions
+├── README.md                         # Project documentation
+├── LICENSE                           # MIT License
 ├── .gitignore
 ├── .claude/
 │   └── skills/
-│       └── codraft/
-│           └── SKILL.md   # The orchestrator skill (main entry point)
+│       ├── codraft/
+│       │   └── SKILL.md              # Orchestrator skill (entry point)
+│       ├── codraft-analyzer/
+│       │   └── SKILL.md              # Analyzer skill (template parsing)
+│       └── codraft-renderer/
+│           └── SKILL.md              # Renderer skill (document output)
+├── codraft_mvp_spec.md               # Original MVP specification
+├── codraft_v2_spec.md                # Full v2 specification
+├── docs/                             # Documentation site (Astro Starlight)
 ├── templates/
-│   ├── _examples/         # Bundled example templates (tracked in git)
-│   │   └── nda/
-│   │       └── nda.docx
-│   └── <user_template>/   # User templates (gitignored)
+│   ├── _examples/                    # Bundled example templates (tracked in git)
+│   │   ├── Bonterms_Mutual_NDA/
+│   │   │   └── Bonterms-Mutual-NDA.docx
+│   │   ├── invoice/
+│   │   │   └── invoice.html
+│   │   ├── consulting_agreement/     # v2 example (docx, conditionals + loops)
+│   │   │   ├── consulting_agreement.docx
+│   │   │   └── config.yaml
+│   │   └── event_invitation/         # v2 example (html, conditionals + loops)
+│   │       ├── event_invitation.html
+│   │       └── config.yaml
+│   └── <user_template>/              # User templates (gitignored)
 │       ├── <name>.docx or <name>.html
-│       └── manifest.yaml  # Auto-generated (gitignored)
-└── output/                # Rendered documents (gitignored)
-    └── <job_name>/        # One folder per rendering job
+│       ├── manifest.yaml             # Auto-generated (gitignored)
+│       └── config.yaml               # Optional developer config
+└── output/                           # Rendered documents (gitignored)
+    └── <job_name>/                   # One folder per rendering job
 ```
 
 ## Key Conventions
 
+### Skills
+
+v2 splits the monolithic skill into three focused skills:
+
+| Skill | Location | Purpose |
+|---|---|---|
+| **Orchestrator** | `.claude/skills/codraft/SKILL.md` | Entry point. Discovery, interview, confirmation, post-render. |
+| **Analyzer** | `.claude/skills/codraft-analyzer/SKILL.md` | Template parsing, variable extraction, manifest generation. |
+| **Renderer** | `.claude/skills/codraft-renderer/SKILL.md` | Docx/HTML rendering, output validation. |
+
+The Orchestrator is the only user-facing skill. It invokes the Analyzer and Renderer via prompt-level instructions.
+
 ### Templates
+
 - Example templates live in `templates/_examples/` (tracked in git)
 - User templates live in `templates/<name>/` (gitignored)
 - The directory name is the template identifier (used for matching user intent)
 - Each directory contains one template file: either `.docx` or `.html` (not both)
-- Templates use `{{ variable_name }}` Jinja2-style placeholders
+- Templates use `{{ variable_name }}` Jinja2-style placeholders for variable substitution
+- Templates may use `{% if %}` / `{% else %}` / `{% endif %}` for conditional sections
+- Templates may use `{% for item in items %}` / `{% endfor %}` for repeating sections
 - `manifest.yaml` is auto-generated by the Analyzer — do not edit manually
 - The Analyzer only regenerates the manifest if the template file is newer than the existing manifest
+- An optional `config.yaml` can be placed alongside the template to provide question overrides, grouping, validation, and choice types (see below)
+
+### config.yaml
+
+An optional file placed alongside the template by the template developer. It controls the interview experience without modifying the template itself. If absent, the Analyzer and Orchestrator use their default behaviours.
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name?"
+    default: ""
+    required: true
+    format_hint: "Full legal name as registered"
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: "bank_transfer"
+  include_ip_assignment:
+    type: boolean
+    question: "Does this engagement involve IP assignment?"
+    default: false
+
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address]
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+  - name: "Milestones"
+    loop: milestones
+    variables: [description, date, amount]
+
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date"
+```
+
+The Analyzer merges config into the manifest. The Orchestrator never reads `config.yaml` directly.
+
+### Manifest v2 Schema
+
+The manifest is the single source of truth the Orchestrator reads. Key sections:
+
+- **`schema_version: 2`** — always 2 for v2 manifests
+- **`variables`** — unconditional variables, always collected during interview
+- **`conditionals`** — variables gated by `{% if %}` / `{% else %}` blocks, with `gate_type` (boolean or equality), `if_variables`, and `else_variables`
+- **`loops`** — variables inside `{% for %}` blocks, collected as lists with `loop_var`, `collection`, and sub-`variables`
+- **`dependencies`** — pre-computed map of gate variables to their dependent variables
+- **`groups`** — optional interview grouping (from config.yaml)
+- **`validation`** — optional cross-field validation rules (from config.yaml)
+
+See `docs/codraft_v2_spec.md` section 3 for the full manifest schema.
+
+### Template Authoring (v2 Syntax)
+
+**Simple variable substitution:**
+```
+This Agreement is entered into by {{ disclosing_party_name }}.
+```
+
+**Conditional sections:**
+```
+{% if include_ip_assignment %}
+The Consultant assigns all IP to {{ ip_ownership_entity }}.
+{% endif %}
+
+{% if payment_method == 'bank_transfer' %}
+Bank: {{ bank_name }}, Account: {{ account_number }}
+{% else %}
+Payment will be made via {{ payment_method }}.
+{% endif %}
+```
+
+**Loop sections:**
+```
+{% for milestone in milestones %}
+Milestone: {{ milestone.description }}, Due: {{ milestone.date }}, Amount: {{ milestone.amount }}
+{% endfor %}
+```
+
+**v2 constraints:**
+- Single-level nesting only (no `{% for %}` inside `{% if %}`, or vice versa)
+- Two condition forms: truthiness (`{% if var %}`) and equality (`{% if var == 'value' %}`)
+- `{% else %}` is supported; `{% elif %}` is deferred to v3
+- No computed fields or expressions
 
 ### Output
+
 - Each rendering job gets its own folder in `output/`
 - Job folder naming: `{template_name}_{key_variable}_{date}/`
 - Docx jobs produce one file; HTML jobs produce both `.html` and `.pdf`
 
 ### Template Engines
+
 - **docx**: Always use `docxtpl` (not raw python-docx) — preserves formatting around variables
 - **html**: Use `jinja2` for rendering, `weasyprint` for PDF conversion
 - Install via: `uv pip install docxtpl pyyaml jinja2 weasyprint`
 
 ### Python Environment
+
 - Use `uv` for all Python environment and package management
 - Format Python code in the style of `black`
 
-## MVP Scope
+## Current Scope (v2)
 
-The MVP supports **simple variable substitution only**:
-- `{{ variable_name }}` placeholders — no conditionals, loops, or computed fields
-- Flat template directory (each template in its own subdirectory)
-- Type inference from variable name suffixes (e.g., `*_date` → date, `*_amount` → number)
+v2 supports:
+- **Variable substitution** — `{{ variable_name }}` placeholders with type inference from name suffixes
+- **Conditional logic** — `{% if %}` / `{% else %}` / `{% endif %}` for including/excluding template sections based on user answers
+- **Loops** — `{% for item in items %}` / `{% endfor %}` for repeating sections, collected as lists during interview
+- **Developer configuration** — optional `config.yaml` per template for custom questions, grouping, validation, and choice types
+- **Skill separation** — three focused skills (Orchestrator, Analyzer, Renderer) instead of one monolithic skill
+- **Manifest v2** — richer manifest schema with `schema_version: 2`, conditionals, loops, dependencies, and optional groups/validation
+
+**v2 constraints:**
+- Single-level nesting only (no blocks inside other blocks)
+- Two condition forms: truthiness and equality (no `{% elif %}`)
+- No computed fields or expressions
+- Variables are always collected from the user, never calculated
 
 ## When Working on This Project
 
-- Read `codraft_mvp_spec.md` for the full specification
-- Read `.claude/skills/codraft/SKILL.md` for the skill implementation details
-- The orchestrator skill is the main entry point — it contains analyzer and renderer logic inline
+- Read `codraft_v2_spec.md` for the full v2 specification
+- Read `codraft_mvp_spec.md` for the original MVP specification
+- Read `.claude/skills/codraft/SKILL.md` for the Orchestrator skill
+- Read `.claude/skills/codraft-analyzer/SKILL.md` for the Analyzer skill
+- Read `.claude/skills/codraft-renderer/SKILL.md` for the Renderer skill
+- The Orchestrator is the user-facing entry point; it invokes the Analyzer and Renderer
 - Test templates should be placed in `templates/` with their own subdirectory
 - All rendered output goes to `output/` — never overwrite templates

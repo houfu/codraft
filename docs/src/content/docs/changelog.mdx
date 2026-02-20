@@ -1,0 +1,27 @@
+---
+title: Changelog
+description: Version history for Codraft
+---
+
+## v0.2 — Codraft v2 (February 2026)
+
+**New features:**
+- Conditional logic with `{% if %}` / `{% else %}` / `{% endif %}` support
+- Loop sections with `{% for item in items %}` / `{% endfor %}` support
+- Developer configuration via optional `config.yaml` per template
+- Interview grouping, conditional groups, and loop groups
+- Cross-field validation rules
+- Skill separation: Orchestrator, Analyzer, and Renderer skills
+- Manifest v2 schema with `schema_version: 2`, conditionals, loops, and dependencies
+- New example templates: Consulting Agreement (docx), Event Invitation (html)
+
+**v2 constraints:**
+- Single-level nesting only
+- Two condition forms (truthiness and equality); no `{% elif %}`
+- No computed fields or expressions
+
+---
+
+## v0.1 — MVP (January 2026)
+
+Initial release. Simple variable substitution in `.docx` and `.html` templates. Jinja2-style `{{ variable_name }}` placeholders with type inference from name suffixes.

@@ -1,0 +1,46 @@
+---
+title: Project Structure
+description: How Codraft is organised on disk
+---
+
+```
+codraft/
+├── CLAUDE.md                         # Project instructions for Claude
+├── README.md                         # Project overview + install guide
+├── LICENSE                           # MIT License
+├── .gitignore
+├── .claude/
+│   └── skills/
+│       ├── codraft/
+│       │   └── SKILL.md              # Orchestrator skill (entry point)
+│       ├── codraft-analyzer/
+│       │   └── SKILL.md              # Analyzer skill (template parsing)
+│       └── codraft-renderer/
+│           └── SKILL.md              # Renderer skill (document output)
+├── docs/                             # Documentation site (Astro Starlight)
+├── tests/                            # Test/benchmark suite
+├── templates/
+│   ├── _examples/                    # Bundled example templates
+│   │   ├── Bonterms_Mutual_NDA/
+│   │   ├── invoice/
+│   │   ├── consulting_agreement/
+│   │   └── event_invitation/
+│   └── <your_template>/              # Your templates (gitignored)
+│       ├── <name>.docx or .html
+│       ├── manifest.yaml             # Auto-generated (do not edit)
+│       └── config.yaml               # Optional developer config
+└── output/                           # Rendered documents (gitignored)
+    └── <job_name>/
+```
+
+## Skills
+
+Codraft v2 uses three focused skills:
+
+| Skill | Purpose |
+|---|---|
+| **Orchestrator** (`.claude/skills/codraft/`) | Entry point. Matches user request to template, runs interview, confirms values, and triggers rendering. |
+| **Analyzer** (`.claude/skills/codraft-analyzer/`) | Parses the template for variables, conditionals, and loops. Generates `manifest.yaml`. Merges `config.yaml` overrides. |
+| **Renderer** (`.claude/skills/codraft-renderer/`) | Renders the template with collected values. Produces `.docx` or `.html` + `.pdf`. Validates output for unfilled placeholders. |
+
+The Orchestrator is the only user-facing skill. The Analyzer and Renderer are invoked by the Orchestrator.

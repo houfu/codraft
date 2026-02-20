@@ -16,3 +16,11 @@ __pycache__/
 
 # FUSE temp files
 .fuse_hidden*
+
+# Docs
+docs/node_modules/
+docs/dist/
+docs/.astro/
+
+# Tests
+tests/results/

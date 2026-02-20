@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ event_name }} — {{ event_date }}</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      color: #333;
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 24pt;
+      color: #222;
+      margin-bottom: 0.2em;
+    }
+    h2 {
+      font-size: 18pt;
+      color: #333;
+      margin-bottom: 0.5em;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2em;
+    }
+    .header-left, .header-right {
+      width: 48%;
+    }
+    .header-right {
+      text-align: right;
+    }
+    .label {
+      font-weight: bold;
+      color: #555;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .event-details {
+      background: #f5f5f5;
+      padding: 1em;
+      margin: 2em 0;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2em 0;
+    }
+    th {
+      background: #f5f5f5;
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 2px solid #ddd;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .guest-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .guest-row:last-child {
+      border-bottom: none;
+    }
+    .dietary-section {
+      margin: 2em 0;
+      padding: 1em;
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      border-radius: 4px;
+    }
+    .footer {
+      margin-top: 3em;
+      font-size: 9pt;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>{{ event_name }}</h1>
+
+  <div class="header">
+    <div class="header-left">
+      <p class="label">Host</p>
+      <p>{{ host_name }}</p>
+      <p>{{ host_address }}</p>
+    </div>
+    <div class="header-right">
+      <p class="label">Date</p>
+      <p>{{ event_date }}</p>
+      <p class="label">Time</p>
+      <p>{{ event_time }}</p>
+    </div>
+  </div>
+
+  <div class="event-details">
+    <p class="label">Location</p>
+    <p>{{ event_location }}</p>
+    <p>{{ event_address }}</p>
+  </div>
+
+  <h2>Event Details</h2>
+  <p>{{ event_description }}</p>
+
+  <h2>RSVP Information</h2>
+  <p>Please RSVP by {{ rsvp_date }} to {{ rsvp_email }} or {{ rsvp_phone }}.</p>
+
+  <h2>Guest List</h2>
+  <p>We look forward to seeing you at our event! Here is the guest list:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Additional Guests</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for guest in guests %}
+      <tr>
+        <td>{{ guest.name }}</td>
+        <td>{{ guest.email }}</td>
+        <td>{{ guest.phone }}</td>
+        <td>{{ guest.num_guests }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if include_dietary_section %}
+  <div class="dietary-section">
+    <h3>Dietary Requirements</h3>
+    <p>Please let us know if you have any dietary requirements:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Dietary Requirements</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for guest in guests %}
+        <tr>
+          <td>{{ guest.name }}</td>
+          <td>{{ guest.dietary_requirements }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <div class="footer">
+    <p>Thank you for your RSVP!</p>
+    <p>{{ host_name }}</p>
+  </div>
+
+</body>
+</html>

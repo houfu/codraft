@@ -1,0 +1,6 @@
+.claude/
+templates/_examples/
+CLAUDE.md
+README.md
+LICENSE
+.gitignore

@@ -1,0 +1,48 @@
+---
+title: Codraft
+description: Document assembly tool for Claude Cowork
+template: splash
+hero:
+  tagline: Intelligent document assembly for legal and business professionals
+  actions:
+    - text: Get Started
+      link: /getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/houfu/codraft
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## How It Works
+
+<CardGrid>
+  <Card title="1. Add Your Template" icon="document">
+    Place a `.docx` or `.html` template in `templates/`, using `{{ variable_name }}` placeholders wherever you need dynamic content.
+  </Card>
+  <Card title="2. Claude Interviews You" icon="puzzle">
+    Tell Claude to "prepare a [document type]". Claude finds the template, extracts all variables, and walks you through a conversational interview — skipping irrelevant sections automatically.
+  </Card>
+  <Card title="3. Get Your Document" icon="approve-check">
+    After confirming all values, the completed document is rendered and saved to `output/`. Docx templates produce `.docx` files; HTML templates produce both `.html` and `.pdf`.
+  </Card>
+</CardGrid>
+
+## Features
+
+<CardGrid>
+  <Card title="Conditional Logic" icon="setting">
+    Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers. The interview skips irrelevant questions automatically.
+  </Card>
+  <Card title="Repeating Sections" icon="list-format">
+    Use `{% for item in items %}` loops for line items, milestones, or any repeating content. Claude collects entries one at a time with a natural "add another?" flow.
+  </Card>
+  <Card title="Two Template Formats" icon="seti:html">
+    Docx templates render to Word documents via `docxtpl`. HTML templates render to both HTML and PDF via `jinja2` and `weasyprint`.
+  </Card>
+  <Card title="Developer Configuration" icon="seti:yaml">
+    Add an optional `config.yaml` to customise question labels, set defaults, define choices, group related fields, and add validation rules — without touching the template.
+  </Card>
+</CardGrid>
