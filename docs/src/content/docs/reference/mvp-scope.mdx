@@ -1,0 +1,31 @@
+---
+title: MVP Scope & Roadmap
+description: What Codraft supports in v2 and what is planned
+---
+
+## v2 Features
+
+Codraft v2 supports:
+
+- **Variable substitution** — `{{ variable_name }}` placeholders with type inference from name suffixes
+- **Conditional logic** — `{% if %}` / `{% else %}` / `{% endif %}` for including/excluding sections
+- **Loops** — `{% for item in items %}` / `{% endfor %}` for repeating sections
+- **Developer configuration** — optional `config.yaml` per template
+- **Two template formats** — `.docx` (via `docxtpl`) and `.html` (via `jinja2` + `weasyprint`)
+- **Skill separation** — three focused skills (Orchestrator, Analyzer, Renderer)
+- **Manifest caching** — analysis is cached and only regenerated when the template changes
+
+## v2 Constraints
+
+- Single-level nesting only (no blocks inside other blocks)
+- Two condition forms: truthiness and equality (no `{% elif %}`)
+- No computed fields or expressions
+- Variables are always collected from the user, never calculated
+
+## v3 Roadmap (Planned)
+
+- `{% elif %}` support
+- Computed/derived fields
+- Nested blocks (limited depth)
+- Multi-template document assembly
+- Web-based interview UI

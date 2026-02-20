@@ -1,0 +1,59 @@
+---
+title: NDA Walkthrough
+description: End-to-end example of assembling a mutual NDA with Codraft
+---
+
+This walkthrough shows how to prepare a completed mutual non-disclosure agreement using the bundled Bonterms NDA template.
+
+## The Template
+
+The `Bonterms_Mutual_NDA` example template is a standard mutual NDA with placeholders for party names, dates, and governing law.
+
+## Step 1: Open Codraft in Cowork
+
+Open Claude Cowork with your Codraft project folder. You should see the Codraft skill available.
+
+## Step 2: Start the Interview
+
+Tell Claude:
+
+> "I need to prepare a mutual NDA"
+
+Claude will find the `Bonterms_Mutual_NDA` template and begin the interview.
+
+## Step 3: Answer the Questions
+
+Claude will ask for values grouped logically:
+
+**Parties**
+- Disclosing party name (e.g., "Acme Pte Ltd")
+- Disclosing party address
+- Receiving party name (e.g., "Beta Corp")
+- Receiving party address
+
+**Agreement Terms**
+- Effective date
+- Governing law (e.g., "Singapore")
+
+## Step 4: Confirm and Render
+
+After all values are collected, Claude shows a summary for review:
+
+```
+Disclosing party: Acme Pte Ltd
+Receiving party: Beta Corp
+Effective date: 15 February 2026
+Governing law: Singapore
+```
+
+Confirm to render. The completed NDA is saved to:
+
+```
+output/
+└── nda_acme_pte_ltd_2026-02-15/
+    └── nda_acme_pte_ltd_2026-02-15.docx
+```
+
+## Step 5: Open the Document
+
+Open the rendered `.docx` file. All placeholders are filled, formatting is preserved, and the document is ready to review, sign, and send.

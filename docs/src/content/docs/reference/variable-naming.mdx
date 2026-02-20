@@ -1,0 +1,23 @@
+---
+title: Variable Naming Reference
+description: Naming conventions for automatic type inference
+---
+
+Name your variables with descriptive suffixes for automatic type inference:
+
+| Suffix | Inferred type | Example |
+|--------|--------------|---------|
+| `*_name` | text | `landlord_name` |
+| `*_address` | text | `property_address` |
+| `*_date` | date | `commencement_date` |
+| `*_email` | email | `tenant_email` |
+| `*_amount`, `*_price`, `*_fee` | number | `rental_amount` |
+| `*_phone`, `*_tel`, `*_mobile` | phone | `contact_phone` |
+| (other) | text | `governing_law` |
+
+## Rules
+
+- Variable names must be valid Python identifiers
+- Use lowercase with underscores: `party_name`, not `PartyName` or `party-name`
+- Be descriptive: `client_address` is better than `addr`
+- The same variable can appear multiple times in a template — it is collected once and substituted everywhere

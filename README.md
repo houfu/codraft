@@ -26,8 +26,7 @@ You'll need a [Claude Cowork](https://claude.ai) account.
 
 ### Download Codraft
 
-1. On the Codraft GitHub page, click the green **Code** button, then click **Download ZIP**
-2. Extract the ZIP file to a folder of your choice (e.g., your Documents folder)
+Go to the [Releases](https://github.com/houfu/codraft/releases) page and download the latest `codraft-v*.zip` file. Extract it to a folder of your choice (e.g., your Documents folder).
 
 ### Open in Cowork
 

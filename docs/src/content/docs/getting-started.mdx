@@ -1,0 +1,57 @@
+---
+title: Getting Started
+description: Install Codraft and prepare your first document
+---
+
+## Prerequisites
+
+You'll need a [Claude Cowork](https://claude.ai) account.
+
+## Installation
+
+### 1. Download Codraft
+
+Go to the [Releases](https://github.com/houfu/codraft/releases) page and download the latest `codraft-v*.zip` file. Extract it to a folder of your choice (e.g., your Documents folder).
+
+### 2. Open in Cowork
+
+Open Claude Cowork and add the extracted folder as a project. That's it — Python dependencies are installed automatically the first time you use the skill.
+
+## Quick Start
+
+### Add a template
+
+Create a subdirectory in `templates/` and place your template file inside:
+
+```
+templates/
+└── nda/
+    └── nda.docx
+```
+
+### Prepare a document
+
+Tell Claude:
+
+> "I need to prepare an NDA"
+
+Claude will find the template, extract its variables, and interview you for the values.
+
+### Get your document
+
+After confirming all values, the rendered document is saved to a job folder:
+
+```
+output/
+└── nda_acme_pte_ltd_2026-02-15/
+    └── nda_acme_pte_ltd_2026-02-15.docx
+```
+
+For HTML templates, both the HTML and PDF are saved:
+
+```
+output/
+└── invoice_acme_2026-02-15/
+    ├── invoice_acme_2026-02-15.html
+    └── invoice_acme_2026-02-15.pdf
+```

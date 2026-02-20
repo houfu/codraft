@@ -31,9 +31,9 @@ codraft/
 │       │   └── SKILL.md              # Analyzer skill (template parsing)
 │       └── codraft-renderer/
 │           └── SKILL.md              # Renderer skill (document output)
-├── docs/
-│   ├── codraft_mvp_spec.md           # Original MVP specification
-│   └── codraft_v2_spec.md            # Full v2 specification
+├── codraft_mvp_spec.md               # Original MVP specification
+├── codraft_v2_spec.md                # Full v2 specification
+├── docs/                             # Documentation site (Astro Starlight)
 ├── templates/
 │   ├── _examples/                    # Bundled example templates (tracked in git)
 │   │   ├── Bonterms_Mutual_NDA/
@@ -205,8 +205,8 @@ v2 supports:
 
 ## When Working on This Project
 
-- Read `docs/codraft_v2_spec.md` for the full v2 specification
-- Read `docs/codraft_mvp_spec.md` for the original MVP specification
+- Read `codraft_v2_spec.md` for the full v2 specification
+- Read `codraft_mvp_spec.md` for the original MVP specification
 - Read `.claude/skills/codraft/SKILL.md` for the Orchestrator skill
 - Read `.claude/skills/codraft-analyzer/SKILL.md` for the Analyzer skill
 - Read `.claude/skills/codraft-renderer/SKILL.md` for the Renderer skill

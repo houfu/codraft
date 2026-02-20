@@ -1,0 +1,18 @@
+# Schema for Codraft test scenario files
+# Each scenario tests one aspect of the rendering pipeline.
+
+# Required fields:
+name: string          # Human-readable scenario name
+description: string   # What this scenario validates
+template: string      # Path relative to tests/fixtures/templates/
+variables: object     # Key-value pairs for template rendering
+expected_output: string  # Path relative to tests/results/ (created at runtime)
+
+# checks: list of assertions to run after rendering
+checks:
+  - type: contains_text     # Output file must contain this string
+    value: string
+  - type: not_contains_text # Output file must NOT contain this string
+    value: string
+  - type: file_exists       # This file must exist after rendering
+    path: string            # Relative to tests/results/

@@ -1,0 +1,26 @@
+/* Codraft design tokens */
+:root {
+  --sl-color-accent-low: #c5cdd7;
+  --sl-color-accent: #1a2332;
+  --sl-color-accent-high: #0d1520;
+  --sl-color-white: #faf9f5;
+  --sl-color-gray-1: #2a2a28;
+  --sl-color-gray-2: #4a4a47;
+  --sl-color-gray-3: #6a6a66;
+  --sl-color-gray-4: #9a9a96;
+  --sl-color-gray-5: #cacac6;
+  --sl-color-gray-6: #eae9e5;
+  --sl-color-black: #1a1a18;
+  --sl-font: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Light mode overrides */
+:root[data-theme='light'],
+.sl-theme-light {
+  --sl-color-bg: #faf9f5;
+  --sl-color-bg-nav: #faf9f5;
+  --sl-color-bg-sidebar: #f2f1ed;
+  --sl-color-text: #2a2a28;
+  --sl-color-text-accent: #1a2332;
+  --sl-color-hairline: #ddddd9;
+}

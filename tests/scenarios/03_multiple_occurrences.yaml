@@ -1,0 +1,19 @@
+name: Multiple occurrences
+description: >
+  The same variable (company_name) appears 4 times in the template.
+  Verifies that all occurrences are replaced with a single collected value.
+
+template: multiple_occurrences/multiple_occurrences.html
+
+variables:
+  company_name: "GlobalTech Ltd"
+
+expected_output: multiple_occurrences/output.html
+
+checks:
+  - type: contains_text
+    value: "GlobalTech Ltd"
+  - type: not_contains_text
+    value: "{{ company_name }}"
+  - type: file_exists
+    path: multiple_occurrences/output.html
