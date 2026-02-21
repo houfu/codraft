@@ -27,3 +27,6 @@ tests/results/
 
 # Plugin build output
 build/
+
+# Claude Code internal
+.claude/worktrees/
