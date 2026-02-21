@@ -24,3 +24,6 @@ docs/.astro/
 
 # Tests
 tests/results/
+
+# Plugin build output
+build/
