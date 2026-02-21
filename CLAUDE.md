@@ -23,6 +23,12 @@ codraft/
 ├── README.md                         # Project documentation
 ├── LICENSE                           # MIT License
 ├── .gitignore
+├── plugin/                           # Plugin metadata (checked in)
+│   ├── .claude-plugin/
+│   │   └── plugin.json               # Plugin name, version placeholder, author
+│   └── README.md                     # Claude Code install instructions
+├── .claude-plugin/                   # Marketplace manifest (checked in)
+│   └── marketplace.json
 ├── .claude/
 │   └── skills/
 │       ├── codraft/
@@ -55,6 +61,22 @@ codraft/
 ```
 
 ## Key Conventions
+
+### Distribution
+
+Codraft ships in two forms:
+
+| Channel | How to get it | Target user |
+|---|---|---|
+| **Cowork zip** | Download from GitHub Releases (`codraft-v*.zip`) | Claude Cowork users |
+| **Claude Code plugin** | `/plugin marketplace add houfu/codraft` | Claude Code users |
+
+**Source of truth:** `.claude/skills/` — never edit SKILL.md files in `plugin/` or `build/`.
+
+**Plugin metadata:**
+- `plugin/.claude-plugin/plugin.json` — plugin name, version, author (version placeholder `0.0.0` overwritten at release time)
+- `.claude-plugin/marketplace.json` — self-referencing marketplace manifest pointing to `./plugin`
+- The GitHub Action assembles the plugin package in `build/plugin/` (ignored by git) and publishes `codraft-plugin-v*.zip` alongside the Cowork zip.
 
 ### Skills
 

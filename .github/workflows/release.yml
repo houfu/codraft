@@ -33,8 +33,33 @@ jobs:
           zip -r "$ZIP_NAME" $FILES
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
+      - name: Set version env
+        run: echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
+
+      - name: Assemble plugin directory
+        run: |
+          mkdir -p build/plugin/.claude-plugin
+          mkdir -p build/plugin/skills
+          mkdir -p build/plugin/templates
+          cp plugin/.claude-plugin/plugin.json build/plugin/.claude-plugin/plugin.json
+          cp plugin/README.md build/plugin/README.md
+          cp -r .claude/skills/codraft build/plugin/skills/
+          cp -r .claude/skills/codraft-analyzer build/plugin/skills/
+          cp -r .claude/skills/codraft-renderer build/plugin/skills/
+          cp -r templates/_examples build/plugin/templates/
+
+      - name: Inject version into plugin.json
+        run: |
+          sed -i "s/\"0.0.0\"/\"${VERSION}\"/" build/plugin/.claude-plugin/plugin.json
+
+      - name: Package plugin zip
+        run: |
+          cd build && zip -r ../codraft-plugin-v${VERSION}.zip plugin/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.ZIP_NAME }}
+          files: |
+            ${{ env.ZIP_NAME }}
+            codraft-plugin-v${{ env.VERSION }}.zip
           generate_release_notes: true

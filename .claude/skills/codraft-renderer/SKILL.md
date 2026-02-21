@@ -21,7 +21,7 @@ This skill is called by the Codraft orchestrator. You receive:
 Ensure dependencies are installed:
 
 ```bash
-uv pip install docxtpl pyyaml jinja2 weasyprint --break-system-packages
+command -v uv > /dev/null 2>&1 && uv pip install docxtpl pyyaml jinja2 weasyprint || pip install docxtpl pyyaml jinja2 weasyprint
 ```
 
 ---
