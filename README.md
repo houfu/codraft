@@ -1,4 +1,4 @@
-![Codraft Logo](./docs/logo.png)
+![Codraft Logo](./docs/public/images/logo.png)
 # Codraft
 
 A document assembly tool built on Claude Cowork. Codraft replaces traditional document automation platforms (docassemble, HotDocs) by using Claude to interview users, collect field values, and produce completed documents from templates -- with support for conditional logic, repeating sections, and developer configuration.
