@@ -33,6 +33,14 @@ Go to the [Releases](https://github.com/houfu/codraft/releases) page and downloa
 1. Open Claude Cowork and add the extracted folder as a project
 2. That's it -- Python dependencies are installed automatically the first time you use the skill
 
+### Claude Code
+
+From within Claude Code:
+
+1. Add the marketplace: `/plugin marketplace add houfu/codraft`
+2. Install the plugin: `/plugin install codraft@codraft`
+3. Say "prepare an NDA" to try it out with a built-in template
+
 ## Quick Start
 
 ### 1. Add a template

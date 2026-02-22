@@ -18,22 +18,25 @@ v2 templates may contain conditional sections (`{% if %}` / `{% else %}`) and lo
 Before first use, ensure dependencies are installed:
 
 ```bash
-uv pip install docxtpl pyyaml jinja2 weasyprint --break-system-packages
+command -v uv > /dev/null 2>&1 && uv pip install docxtpl pyyaml jinja2 weasyprint || pip install docxtpl pyyaml jinja2 weasyprint
 ```
 
 ---
 
 ## Phase 1 — Template Discovery
 
-1. List all template directories. Templates can live in two places:
-   - `templates/` — user templates (gitignored, not committed to the repo)
-   - `templates/_examples/` — bundled example templates (tracked in git)
-2. Scan both locations. Each subdirectory name is a template identifier. For `_examples/`, the identifier is the subdirectory name within it (e.g., `templates/_examples/nda/` -> identifier is `nda`).
-3. If the user's request clearly maps to a template (e.g., "prepare an NDA" -> `nda/`), select it automatically and tell the user which template you're using.
-4. If ambiguous or no match, present all available templates (from both locations) and ask the user to choose.
-5. Matching should be fuzzy and reasonable — "tenancy" matches `tenancy_agreement/`, "consulting" matches `consulting_agreement/`.
-6. If the same template name exists in both locations, prefer the user's copy in `templates/` over the one in `_examples/`.
-7. If the template has `meta.display_name` in its manifest, use that when presenting to the user.
+1. List all template directories. Templates can live in multiple locations, checked in this priority order:
+   - `templates/` — user templates in the current working directory (highest priority)
+   - `${CLAUDE_PLUGIN_ROOT}/templates/_examples/` — bundled templates when running as a Claude Code plugin (if `CLAUDE_PLUGIN_ROOT` is set)
+   - `templates/_examples/` — bundled example templates in Cowork context (fallback when `CLAUDE_PLUGIN_ROOT` is not set)
+2. Scan all applicable locations. Each subdirectory name is a template identifier. For bundled locations, the identifier is the subdirectory name within `_examples/` (e.g., `_examples/nda/` → identifier is `nda`).
+3. When `CLAUDE_PLUGIN_ROOT` is set (plugin context), search `${CLAUDE_PLUGIN_ROOT}/templates/_examples/` for bundled templates and label them "(built-in)" when listing them to the user.
+4. When `CLAUDE_PLUGIN_ROOT` is not set (Cowork context), fall back to `templates/_examples/` relative to the working directory.
+5. If the user's request clearly maps to a template (e.g., "prepare an NDA" → `nda/`), select it automatically and tell the user which template you're using.
+6. If ambiguous or no match, present all available templates (from all locations) and ask the user to choose.
+7. Matching should be fuzzy and reasonable — "tenancy" matches `tenancy_agreement/`, "consulting" matches `consulting_agreement/`.
+8. If the same template name exists in both user `templates/` and a bundled location, prefer the user's copy.
+9. If the template has `meta.display_name` in its manifest, use that when presenting to the user.
 
 ---
 
@@ -301,3 +304,7 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
 - **The manifest is a cache** — regenerate it if the template file is newer or if `schema_version` is missing/less than 2.
 - **Boolean coercion** — when passing data to the renderer, ensure boolean variables are Python `True`/`False`, not strings like `"yes"` or `"no"`.
 - You assist with legal workflows but do not provide legal advice. All documents should be reviewed by qualified legal professionals before being relied upon. Offer to read the documents, but remind the user to seek advice.
+
+## Plugin Context Notes
+
+When running as a Claude Code plugin (i.e., `CLAUDE_PLUGIN_ROOT` is set), sub-skills are namespaced. If bare skill names (`codraft-analyzer`, `codraft-renderer`) do not resolve, use the namespaced forms: `codraft:codraft-analyzer` and `codraft:codraft-renderer`.

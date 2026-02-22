@@ -1,0 +1,13 @@
+{
+  "name": "codraft",
+  "owner": {
+    "name": "Ang Hou Fu"
+  },
+  "plugins": [
+    {
+      "name": "codraft",
+      "source": "./plugin",
+      "description": "Document assembly tool with conditional logic, loops, and developer configuration."
+    }
+  ]
+}
