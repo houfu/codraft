@@ -3,13 +3,15 @@ title: Easy to Install
 description: No server, no database, no hosting — just download and go
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 Codraft runs entirely inside Claude. There is no server to spin up, no database to configure, and nothing to host. You get document automation the moment you install it.
 
 ## Two ways to install
 
 Pick whichever matches your setup:
 
-**Claude Cowork** -- Download the latest `codraft-v*.zip` from [GitHub Releases](https://github.com/houfu/codraft/releases), unzip it, and drop the folder into your Cowork workspace. Done.
+**Claude Cowork** -- Download the latest `codraft-v*.zip` from [GitHub Releases](https://github.com/houfu/codraft/releases), unzip it, and open the folder as a new Cowork project. Done.
 
 **Claude Code** -- Run a single command:
 
@@ -19,9 +21,17 @@ Pick whichever matches your setup:
 
 That is the entire installation process.
 
+## No terminal required
+
+<Aside>This section applies to **Claude Cowork**. If you want to use Claude Code or others, be our guest!</Aside>
+
+If you are not a developer, Claude Cowork is the right choice. Installation is just two steps: download a zip file and open the folder. That is it — no terminal, no command line, no coding environment, nothing to configure.
+
+Everything else happens inside the Claude conversation you already know how to use.
+
 ## Dependencies handle themselves
 
-Codraft relies on a handful of Python packages -- `docxtpl`, `pyyaml`, `jinja2`, and `weasyprint`. You never need to install them manually. The first time a skill runs it checks for missing packages and installs them automatically using `uv`. After that initial run, everything is cached locally.
+Codraft relies on a handful of Python packages -- `docxtpl`, `pyyaml`, `jinja2`, and `weasyprint`. You never need to install them manually. When a skill runs, it installs any missing packages automatically. After the initial install, everything is cached locally.
 
 ## No separate app
 
@@ -29,8 +39,14 @@ There is no standalone application, no Electron window, no browser tab to keep o
 
 That means zero context-switching. Ask Claude to prepare a document, answer a few questions, and the finished file appears in your `output/` folder -- all without leaving the chat.
 
-## Works offline
+## Share it with a colleague
 
-Because rendering happens locally on your machine, you do not need a persistent internet connection after installation. Templates are local files, the rendering engines run locally, and output stays on your disk. No cloud uploads, no waiting for a remote server to respond.
+Because Codraft is just a folder, it is completely portable. If you have built a set of templates for your own work, sharing them is as simple as zipping up the folder and sending it over. Your colleague opens it as a Cowork project on their own machine and can use the same templates to produce the same documents.
 
-If you can run Claude, you can run Codraft.
+No deployment, no shared server, no access management. The whole setup travels in a zip file.
+
+## Your files stay local
+
+Templates are local files, rendering happens on your machine, and output stays on your disk. No cloud uploads, no waiting for a remote server to respond.
+
+Codraft requires an active Claude session -- but your documents never leave your machine.
