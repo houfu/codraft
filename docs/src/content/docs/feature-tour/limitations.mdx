@@ -11,6 +11,8 @@ Codraft's strengths come from using Claude to conduct the interview. Its limitat
 
 Codraft's interview is driven by Claude, not by a fixed script. A `config.yaml` lets template authors customize question text, groupings, defaults, and validation — but it does not lock Claude into a specific sequence or phrasing. Claude may rephrase questions, combine related ones, or adapt based on how the conversation unfolds.
 
+This means no two interviews are identical. Run the same template twice and you may get different question groupings, a different order, and different phrasing — even with the same `config.yaml` in place. The variables collected will be the same, but the path to collecting them will not.
+
 If your use case requires a precise, repeatable interview with guaranteed question order and exact wording — a compliance checklist, an onboarding script, a regulated intake form — Codraft is not the right fit. A deterministic form tool will serve you better.
 
 ## The output is shaped by the conversation, not just the template
@@ -65,3 +67,13 @@ Codraft runs as Claude skills, which means it needs a client that supports them.
 - **OpenCode** or other Claude Code-compatible clients
 
 It will not work in the Claude web interface, the Claude mobile app, or the API directly.
+
+## Where traditional tools have the advantage
+
+The limitations above are trade-offs, not oversights. Traditional tools solve several of these problems:
+
+- **Deterministic interviews** -- a form tool guarantees question order, exact wording, and repeatable output. If that is a requirement, a form tool is the right choice.
+- **Multi-user systems** -- Docassemble supports authenticated access, branching workflows, and shared data. Codraft has no multi-user layer.
+- **No Claude dependency** -- if your organisation cannot use Claude, every alternative in this space works without it.
+
+See [How Codraft Compares](/codraft/feature-tour/how-it-compares/) for a full breakdown.

@@ -3,9 +3,15 @@ title: It's Just a Conversation
 description: Why a Claude interview feels nothing like filling out a guided form
 ---
 
+import { Aside } from '@astrojs/starlight/components';
+
 A guided interview asks a fixed sequence of questions, each answer feeding into a predetermined next step. The system only understands inputs it was programmed to handle. You adapt to it.
 
 Codraft works the other way around. Claude understands language, context, and intent — so the interview adapts to you.
+
+<Aside type="note">
+  Every tool in this space -- Docassemble, HotDocs, Gavel, Knackly -- conducts the interview as a guided form: fixed questions, fixed order, one field at a time. The conversational approach is specific to Codraft.
+</Aside>
 
 ## You do not have to follow the order
 
@@ -47,7 +53,9 @@ Claude: I can see: TechCorp Pte Ltd, James Lim, james@techcorp.sg,
 
 A form cannot do this. It has no idea what a namecard is.
 
-*Requires a client that supports image uploads — available in Claude Cowork and Claude Code.*
+<Aside>
+  Claude supports image understanding, web fetch, and search. Whether these are available depends on which client you are using -- check your client's documentation to confirm what is exposed in your setup.
+</Aside>
 
 ## Ambiguity becomes dialogue, not an error
 
@@ -139,4 +147,4 @@ Nothing is written to disk until you confirm. If you spot an error, you correct 
 
 ---
 
-The trade-off is that a conversation is less predictable than a form. The [Limitations](/feature-tour/limitations/) page covers what Codraft cannot do. But for the interview itself, the lack of rigid determinism is the point.
+The trade-off is that a conversation is less predictable than a form. The [Limitations](/codraft/feature-tour/limitations/) page covers what Codraft cannot do. But for the interview itself, the lack of rigid determinism is the point.

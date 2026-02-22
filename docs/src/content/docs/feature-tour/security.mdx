@@ -32,3 +32,11 @@ There is no compiled binary, no minified JavaScript, and no remote configuration
 ## No additional third parties
 
 Beyond Anthropic's API, Codraft introduces no external services. The Python packages it uses (`docxtpl`, `jinja2`, `weasyprint`, `pyyaml`) run locally and make no network requests during rendering, unless your HTML template references external resources such as web fonts or remote stylesheets.
+
+## How this compares to SaaS tools
+
+Cloud-based document assembly tools -- Gavel, Knackly, Bryter -- process your documents on their servers. Document content, variable values, and sometimes templates are transmitted to and stored by those services.
+
+Codraft renders locally. Output files never leave your machine. The only data that passes through a third-party service is the interview conversation itself -- via Anthropic's API, under Anthropic's privacy policy, the same as any Claude session.
+
+If your organisation has data residency requirements or cannot use cloud document services, local rendering is a meaningful distinction.
