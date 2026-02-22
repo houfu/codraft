@@ -1,7 +1,7 @@
 {
   "name": "codraft",
   "description": "Document assembly tool. Interview users and render completed documents from docx/HTML templates with conditional logic, loops, and developer configuration.",
-  "version": "0.0.0",
+  "version": "2",
   "author": {
     "name": "Ang Hou Fu"
   }
