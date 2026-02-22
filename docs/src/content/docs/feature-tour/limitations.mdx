@@ -1,0 +1,47 @@
+---
+title: Limitations
+description: What Codraft can't do yet — be realistic about the constraints
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Codraft is capable, but it is not a full-featured document automation platform yet. Here is what you should know before you start.
+
+## Single-level nesting only
+
+You cannot place a `{% for %}` loop inside an `{% if %}` block, or an `{% if %}` block inside a `{% for %}` loop. Each control structure must stand on its own at the top level of the template.
+
+This means you cannot conditionally include a repeating section, or loop over items that themselves contain conditional content. If your document needs that level of complexity, you will need to restructure the template into simpler sections.
+
+## Two condition forms only
+
+Conditional blocks support two patterns:
+
+- **Truthiness** -- `{% if variable %}` checks whether a value is present or true
+- **Equality** -- `{% if variable == 'value' %}` checks for an exact match
+
+There is no `{% elif %}`, no `and`/`or` operators, and no complex boolean expressions. If you need multi-branch logic, you will need to use separate `{% if %}` blocks for each case.
+
+## No computed fields
+
+Every variable in a template is collected directly from the user during the interview. You cannot define a variable whose value is derived from other variables -- for example, calculating a total from a quantity and unit price.
+
+If your document needs computed values, calculate them outside of Codraft and provide them as answers during the interview.
+
+## No expressions
+
+Templates do not support math operations, string manipulation, or Jinja2 filters. A placeholder like `{{ amount * 1.1 }}` or `{{ name | upper }}` will not work. Variables are substituted as-is.
+
+## Requires a compatible client
+
+Codraft runs as Claude skills, which means it needs a client that supports them. Currently that means:
+
+- **Claude Cowork** (Anthropic's native desktop client)
+- **Claude Code** (CLI-based development environment)
+- **OpenCode** or other Claude Code-compatible clients
+
+It will not work in the Claude web interface, the Claude mobile app, or the API directly.
+
+<Aside type="tip" title="Looking ahead">
+These are v2 constraints. Several of them -- nested blocks, `elif` support, computed fields -- are on the roadmap for future versions. Check the [Roadmap](/reference/roadmap/) for what is planned.
+</Aside>

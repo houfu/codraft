@@ -1,0 +1,207 @@
+---
+title: Configuring with config.yaml
+description: Customise the interview experience with an optional config.yaml alongside your template
+---
+
+An optional `config.yaml` file placed next to your template gives you full control over the interview experience — without modifying the template itself. The Analyzer merges it into the manifest; the Orchestrator reads only the manifest.
+
+```
+templates/
+└── consulting_agreement/
+    ├── consulting_agreement.docx   ← template
+    └── config.yaml                 ← interview configuration
+```
+
+If no `config.yaml` is present, Codraft uses sensible defaults: variable names are converted to labels, types are inferred from name suffixes, and questions are presented in the order they appear in the template.
+
+## Top-level structure
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+
+variables:
+  # per-variable overrides
+
+groups:
+  # interview grouping and ordering
+
+validation:
+  # cross-field rules
+```
+
+All sections are optional. You can use just `variables:` to override question labels without touching groups or validation.
+
+## `meta`
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+```
+
+`display_name` is shown to the user when Claude confirms which template it matched. `description` is used internally and may appear in future template directory features.
+
+## `variables`
+
+Each entry overrides one variable's defaults:
+
+```yaml
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name as it should appear in the agreement?"
+    required: true
+    format_hint: "Full registered name, e.g. Acme Pte Ltd"
+
+  effective_date:
+    type: date
+    default: "today"
+    label: "Agreement Date"
+
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: bank_transfer
+    question: "How will the client pay?"
+
+  include_ip_assignment:
+    type: boolean
+    default: false
+    question: "Does this engagement involve IP assignment to the client?"
+```
+
+### Variable fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `label` | string | Short label shown above the input field |
+| `question` | string | Full question text Claude asks the user |
+| `type` | string | Explicit type override (see types below) |
+| `default` | any | Pre-filled value; use `"today"` for today's date |
+| `required` | boolean | If `true`, the user cannot skip this field (default: `false`) |
+| `format_hint` | string | Helper text shown alongside the question |
+| `choices` | list | For `type: choice` — the list of valid options |
+
+### Variable types
+
+| Type | Use when |
+|------|----------|
+| `text` | Free text; the default for most variables |
+| `date` | A calendar date |
+| `number` | A numeric value (currency, quantity, percentage) |
+| `email` | An email address |
+| `phone` | A phone number |
+| `boolean` | A yes/no gate for a conditional section |
+| `choice` | One of a fixed set of options |
+
+## `groups`
+
+Groups control how the interview is structured. Without groups, Claude presents variables one at a time in template order. With groups, related variables are batched under a heading and presented together.
+
+### Basic group
+
+```yaml
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address, consultant_name, consultant_address]
+
+  - name: "Engagement Terms"
+    variables: [effective_date, end_date, governing_law]
+```
+
+### Conditional group
+
+A group that only appears when a gate variable is `true`. Claude asks the gate question first; if the answer is no, the entire group is skipped.
+
+```yaml
+groups:
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+```
+
+The `condition` value must be a boolean variable already collected earlier in the interview.
+
+### Loop group
+
+A group that maps to a `{% for %}` loop in the template. Claude collects items one at a time, prompting for the sub-fields on each pass.
+
+```yaml
+groups:
+  - name: "Milestones"
+    loop: milestones
+    variables: [description, date, amount]
+```
+
+`loop` must match the collection name used in the template (`{% for milestone in milestones %}`). The `variables` list names the sub-fields of each item.
+
+## `validation`
+
+Cross-field rules evaluated after all values are collected but before rendering:
+
+```yaml
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date."
+
+  - rule: "service_fee > 0"
+    message: "The service fee must be a positive number."
+```
+
+If a rule fails, Claude reports the `message` and prompts the user to re-enter the offending values. Rules use Python expression syntax and have access to all collected variable values.
+
+## Complete example
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement with optional IP assignment and milestone schedule"
+
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name?"
+    required: true
+
+  effective_date:
+    type: date
+    default: "today"
+    label: "Agreement Date"
+
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: bank_transfer
+
+  include_ip_assignment:
+    type: boolean
+    default: false
+    question: "Does this engagement involve IP assignment to the client?"
+
+  include_milestones:
+    type: boolean
+    default: false
+    question: "Should the agreement include a milestone payment schedule?"
+
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address, consultant_name, consultant_address]
+
+  - name: "Engagement Terms"
+    variables: [effective_date, end_date, governing_law, payment_method]
+
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+
+  - name: "Milestones"
+    condition: include_milestones
+    loop: milestones
+    variables: [description, date, amount]
+
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date."
+```

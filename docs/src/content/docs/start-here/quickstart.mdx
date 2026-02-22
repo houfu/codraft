@@ -1,0 +1,124 @@
+---
+title: Quickstart
+description: Prepare your first document with Codraft in under five minutes using the bundled Bonterms Mutual NDA
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+This guide walks you through preparing the bundled **Bonterms Mutual NDA** using Claude Cowork. You will go from zero to a completed Word document in under five minutes.
+
+<Aside>
+Codraft ships with the [Bonterms Mutual NDA](https://bonterms.com/) as an example template. It is a real, production-quality mutual NDA released under CC BY 4.0.
+</Aside>
+
+## Prepare the NDA
+
+<Steps>
+
+1. **Open Claude Cowork and attach your Codraft folder**
+
+   Create a new project in Claude Cowork and select the folder where you extracted (or cloned) Codraft as the project directory. Cowork loads the skills and project context automatically.
+
+2. **Ask Claude to prepare the NDA**
+
+   Type a natural request:
+
+   ```
+   Prepare a mutual NDA
+   ```
+
+   Claude matches your request to the `Bonterms_Mutual_NDA` template, analyzes it for variables, and starts the interview.
+
+3. **Answer the interview questions**
+
+   Claude walks through the 13 variables in the template, grouping related fields together. Here is what a typical interview looks like:
+
+   ```
+   Let's prepare the Bonterms Mutual NDA. I'll walk through the details
+   with you.
+
+   First, what is the purpose of this NDA?
+   > Evaluating a potential partnership between our two companies
+
+   What is the effective date?
+   > 2026-03-01
+
+   What is the term of the NDA?
+   > 2 years
+
+   What is the confidentiality period?
+   > 3 years
+
+   What is the governing law?
+   > State of California
+
+   Which courts will have jurisdiction?
+   > State and federal courts in San Francisco, California
+
+   Are there any additional terms?
+   > None
+
+   Now for Party 1. What is Party 1's name?
+   > Acme Corp
+
+   Party 1 signatory name and title?
+   > Jane Smith, CEO
+
+   Party 1 signing date?
+   > 2026-03-01
+
+   And Party 2. What is Party 2's name?
+   > Widgets Inc
+
+   Party 2 signatory name and title?
+   > Bob Johnson, General Counsel
+
+   Party 2 signing date?
+   > 2026-03-01
+   ```
+
+4. **Confirm the values**
+
+   Claude presents a summary of all collected values and asks you to confirm before rendering:
+
+   ```
+   Here's a summary of the NDA details:
+
+   Purpose: Evaluating a potential partnership between our two companies
+   Effective Date: 2026-03-01
+   Term: 2 years
+   Confidentiality Period: 3 years
+   Governing Law: State of California
+   Courts: State and federal courts in San Francisco, California
+   Additional Terms: None
+   Party 1: Acme Corp (Jane Smith, CEO) — signing 2026-03-01
+   Party 2: Widgets Inc (Bob Johnson, General Counsel) — signing 2026-03-01
+
+   Does everything look correct?
+   > Yes, go ahead
+   ```
+
+5. **Get the output file**
+
+   Claude renders the template and saves the completed document to the `output/` folder:
+
+   ```
+   Done! Your NDA has been saved to:
+   output/Bonterms_Mutual_NDA_Acme_Corp_2026-03-01/Bonterms-Mutual-NDA.docx
+   ```
+
+   Open the `.docx` file in Word, Google Docs, or any compatible application to review the final document.
+
+</Steps>
+
+## What just happened
+
+Behind the scenes, Codraft ran three steps:
+
+1. **Discovery** -- Claude matched "mutual NDA" to the `Bonterms_Mutual_NDA` template directory
+2. **Analysis** -- The Analyzer skill parsed the `.docx` template, extracted all 13 variables, and produced a `manifest.yaml`
+3. **Rendering** -- After you confirmed the values, the Renderer skill used `docxtpl` to fill in the template and saved the output
+
+## Ready to explore more?
+
+[Feature Tour](/codraft/feature-tour/easy-to-install/) -- see all of Codraft's features at a glance.

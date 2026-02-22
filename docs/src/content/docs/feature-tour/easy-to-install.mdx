@@ -1,0 +1,36 @@
+---
+title: Easy to Install
+description: No server, no database, no hosting — just download and go
+---
+
+Codraft runs entirely inside Claude. There is no server to spin up, no database to configure, and nothing to host. You get document automation the moment you install it.
+
+## Two ways to install
+
+Pick whichever matches your setup:
+
+**Claude Cowork** -- Download the latest `codraft-v*.zip` from [GitHub Releases](https://github.com/houfu/codraft/releases), unzip it, and drop the folder into your Cowork workspace. Done.
+
+**Claude Code** -- Run a single command:
+
+```bash
+/plugin marketplace add houfu/codraft
+```
+
+That is the entire installation process.
+
+## Dependencies handle themselves
+
+Codraft relies on a handful of Python packages -- `docxtpl`, `pyyaml`, `jinja2`, and `weasyprint`. You never need to install them manually. The first time a skill runs it checks for missing packages and installs them automatically using `uv`. After that initial run, everything is cached locally.
+
+## No separate app
+
+There is no standalone application, no Electron window, no browser tab to keep open. Codraft lives where Claude already lives. You interact with it through the same conversation interface you use for everything else in Claude Cowork or Claude Code.
+
+That means zero context-switching. Ask Claude to prepare a document, answer a few questions, and the finished file appears in your `output/` folder -- all without leaving the chat.
+
+## Works offline
+
+Because rendering happens locally on your machine, you do not need a persistent internet connection after installation. Templates are local files, the rendering engines run locally, and output stays on your disk. No cloud uploads, no waiting for a remote server to respond.
+
+If you can run Claude, you can run Codraft.

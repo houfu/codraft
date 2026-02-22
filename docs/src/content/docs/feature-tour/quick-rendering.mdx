@@ -1,0 +1,45 @@
+---
+title: Quick Rendering
+description: Get Word documents, HTML, and PDF output in seconds
+---
+
+Once the interview is complete and you confirm the collected values, Codraft renders your finished document immediately. No queue, no cloud processing, no waiting.
+
+## Word documents
+
+Templates authored as `.docx` files produce polished Word documents. Codraft uses `docxtpl` under the hood, which means every font, table, header, and style in your original document is preserved exactly. Only the placeholders change.
+
+Your formatting stays intact -- bold text stays bold, tables keep their borders, and page breaks remain where you put them.
+
+## HTML and PDF
+
+Templates authored as `.html` files produce two outputs: the rendered HTML file and a PDF generated from it via WeasyPrint. You get both automatically, no extra steps required.
+
+This is ideal for invoices, proposals, and any document that needs to look good on screen and in print.
+
+## Output lands in one place
+
+Every rendering job creates its own folder inside `output/`, named with the template, a key variable value, and the date:
+
+```
+output/
+  consulting_agreement_AcmePteLtd_2026-03-01/
+    consulting_agreement.docx
+```
+
+For HTML templates, you get both files in the same folder:
+
+```
+output/
+  invoice_AcmePteLtd_2026-03-01/
+    invoice.html
+    invoice.pdf
+```
+
+No files are overwritten. Each job is isolated, so you can render the same template repeatedly for different clients or dates without losing previous output.
+
+## Entirely local
+
+Rendering happens on your machine. Your templates and data never leave your disk. There is no upload to a remote service, no third-party processing, and no dependency on an internet connection after the initial package install.
+
+For sensitive documents -- contracts, NDAs, financial agreements -- that locality matters.

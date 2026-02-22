@@ -1,0 +1,63 @@
+---
+title: Introduction
+description: What Codraft is, the problem it solves, and how it works
+---
+
+Codraft is a document assembly tool built on [Claude Cowork](https://claude.ai). It replaces traditional document automation platforms — docassemble, HotDocs, Documate — with something much simpler: a conversational interview driven by Claude, producing completed documents from plain templates.
+
+## The problem with traditional document assembly
+
+Traditional tools require you to:
+
+- Learn a proprietary scripting language
+- Build a web-based interview form by hand
+- Host and maintain a server
+- Train non-technical users on complex software
+
+Codraft's approach: write a template in Word or HTML, add `{{ variable_name }}` placeholders, and let Claude handle everything else.
+
+## How it works
+
+**1. You write a template**
+
+Add a `.docx` or `.html` file to `templates/`, using Jinja2-style placeholders wherever you need dynamic content:
+
+```
+This Agreement is entered into between {{ client_name }} ("Client")
+and {{ consultant_name }} ("Consultant"), effective {{ effective_date }}.
+```
+
+**2. Claude interviews you**
+
+Tell Claude: *"Prepare a consulting agreement"*. Claude finds your template, analyzes it for variables, conditional sections, and loops — then walks you through a natural conversation to collect all the values.
+
+```
+Let's prepare the Consulting Agreement. I'll start with the parties.
+
+What is the client's full legal name?
+> Acme Pte Ltd
+
+What is the consultant's full legal name?
+> Jane Smith Consulting LLC
+```
+
+**3. You get a completed document**
+
+Once confirmed, the document is rendered and saved to `output/`. Docx templates produce Word documents; HTML templates produce both HTML and PDF.
+
+## What you can build
+
+Codraft works for any document that follows a consistent structure with variable content:
+
+- **Legal agreements** — NDAs, consulting agreements, service contracts, leases
+- **Business documents** — proposals, invoices, statements of work
+- **HR documents** — offer letters, employment agreements, onboarding forms
+- **Compliance documents** — privacy notices, terms of service, consent forms
+
+## What Codraft is not
+
+Codraft is not a general document editor. It is not a CMS, a form builder, or a word processor. It is a fill-in-the-blanks engine: the template author controls the structure, Claude collects the values, and the output is a completed instance of that template.
+
+## Ready to start?
+
+→ [Quickstart](/codraft/start-here/quickstart/)
