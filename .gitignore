@@ -25,8 +25,10 @@ docs/.astro/
 # Tests
 tests/results/
 
-# Plugin build output
+# Plugin build output (synced into plugin/ at release by build-plugin.sh)
 build/
+plugin/skills/
+plugin/templates/
 
 # Claude Code internal
 .claude/worktrees/

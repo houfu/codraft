@@ -3,6 +3,6 @@
   "description": "Document assembly tool. Interview users and render completed documents from docx/HTML templates with conditional logic, loops, and developer configuration.",
   "version": "0.0.0",
   "author": {
-    "name": "houfu"
+    "name": "Ang Hou Fu"
   }
 }

@@ -10,21 +10,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Read release manifest
-        id: manifest
-        run: |
-          echo "files=$(cat release-manifest.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get version from tag
         id: version
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
 
-      - name: Build release ZIP
+      - name: Set version env
+        run: echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
+
+      - name: Sync plugin directory
+        run: bash scripts/build-plugin.sh "${VERSION}"
+
+      - name: Commit updated plugin/
         run: |
-          VERSION=${{ steps.version.outputs.version }}
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add plugin/
+          git diff --cached --quiet || git commit -m "chore: update plugin for release v${VERSION}"
+          git push origin HEAD:main
+
+      - name: Build Cowork ZIP
+        run: |
           ZIP_NAME="codraft-v${VERSION}.zip"
-          # Read manifest and zip only listed files/dirs
           while IFS= read -r line || [[ -n "$line" ]]; do
             [ -z "$line" ] && continue
             [ "${line:0:1}" = "#" ] && continue
@@ -33,28 +42,8 @@ jobs:
           zip -r "$ZIP_NAME" $FILES
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
-      - name: Set version env
-        run: echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
-
-      - name: Assemble plugin directory
-        run: |
-          mkdir -p build/plugin/.claude-plugin
-          mkdir -p build/plugin/skills
-          mkdir -p build/plugin/templates
-          cp plugin/.claude-plugin/plugin.json build/plugin/.claude-plugin/plugin.json
-          cp plugin/README.md build/plugin/README.md
-          cp -r .claude/skills/codraft build/plugin/skills/
-          cp -r .claude/skills/codraft-analyzer build/plugin/skills/
-          cp -r .claude/skills/codraft-renderer build/plugin/skills/
-          cp -r templates/_examples build/plugin/templates/
-
-      - name: Inject version into plugin.json
-        run: |
-          sed -i "s/\"0.0.0\"/\"${VERSION}\"/" build/plugin/.claude-plugin/plugin.json
-
-      - name: Package plugin zip
-        run: |
-          cd build && zip -r ../codraft-plugin-v${VERSION}.zip plugin/
+      - name: Package plugin ZIP
+        run: zip -r "codraft-plugin-v${VERSION}.zip" plugin/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
