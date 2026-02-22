@@ -15,6 +15,7 @@ export default defineConfig({
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/houfu/codraft' },
       ],
+      favicon: '/favicon.svg',
       customCss: ['./src/styles/custom.css'],
       sidebar: [
         {
