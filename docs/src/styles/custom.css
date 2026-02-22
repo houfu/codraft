@@ -29,3 +29,9 @@
   --sl-color-accent: #5b7fa6;
   --sl-color-accent-high: #a8c4e0;
 }
+
+/* medium-zoom: ensure overlay and zoomed image appear above the sidebar */
+.medium-zoom-overlay,
+.medium-zoom-image--opened {
+  z-index: 9999;
+}

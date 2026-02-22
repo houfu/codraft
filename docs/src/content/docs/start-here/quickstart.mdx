@@ -8,27 +8,64 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 This guide walks you through preparing the bundled **Bonterms Mutual NDA** using Claude Cowork. You will go from zero to a completed Word document in under five minutes.
 
 <Aside>
-Codraft ships with the [Bonterms Mutual NDA](https://bonterms.com/) as an example template. It is a real, production-quality mutual NDA released under CC BY 4.0.
+Codraft ships with the [Bonterms Mutual NDA](https://bonterms.com/download-center/mutual-nda) as an example template. It is a real, production-quality mutual NDA released under CC BY 4.0.
+</Aside>
+
+## Get a Claude account and download the Desktop app
+
+<Aside>
+Skip this step if you already have a Claude Pro or Max account and downloaded the Desktop App.  
+</Aside>
+
+<Steps>
+1. Go to [Claude](https://claude.ai) and get an account. You will need at least Claude Pro (USD20/month) in order to use Cowork.
+
+2. Download the [Claude Desktop App](https://claude.com/download) for Windows or Mac. Follow the instructions to install the app in your computer and connect it to your account.  
+
+</Steps>
+
+## Download the latest Codraft Folder
+
+  There are several ways to use Codraft. For this quickstart, download the latest release:
+
+  **[⬇ Download codraft-latest.zip](https://github.com/houfu/codraft/releases/latest/download/codraft-latest.zip)**
+
+  Extract the contents to a place where you can find it (Downloads or Documents).
+
+![Screenshot showing the release folder](/codraft/images/quickstarts/highlight_release_folder.png)
+
+<Aside>
+  **Don't download the plugin file.** The plugin is used for Claude Code and other plugin marketplaces.
 </Aside>
 
 ## Prepare the NDA
 
 <Steps>
 
-1. **Open Claude Cowork and attach your Codraft folder**
+1. **Open Claude Cowork and use your Codraft folder**
 
-   Create a new project in Claude Cowork and select the folder where you extracted (or cloned) Codraft as the project directory. Cowork loads the skills and project context automatically.
+    Open the Claude Desktop App and switch to the Cowork Tab (Cmd+2 on Mac). Work in the Cowork folder you just downloaded by selecting it in the dropdown box.
 
-2. **Ask Claude to prepare the NDA**
+    Type a natural request:
 
-   Type a natural request:
+    ```
+    Prepare a mutual NDA.
+    ```
 
-   ```
-   Prepare a mutual NDA
-   ```
+    ![Screenshot showing the Cowork screen with the Codraft folder selected, and a prompt "Prepare a mtual NDA" is entered.](/codraft/images/quickstarts/Codraft-start.png)
 
-   Claude matches your request to the `Bonterms_Mutual_NDA` template, analyzes it for variables, and starts the interview.
+2. **Claude prepares the NDA**
 
+   Once Claude receives the task, it matches your request to the `Bonterms_Mutual_NDA` template, analyzes it for variables, and starts the interview. In the background, Claude installs the dependencies it needs and reads the templates. It looks for variables and creates a plan on how to ask and group questions in order to fill the template. 
+
+  
+</Steps>
+
+<Aside>
+The first time you run Codraft on a template, Claude is running code to analyse the template in detecting variables and generating questions. This file is saved in the template folder, speeding up future runs (at least until the next time you adjust the template.)
+</Aside>
+
+<Steps>  
 3. **Answer the interview questions**
 
    Claude walks through the 13 variables in the template, grouping related fields together. Here is what a typical interview looks like:
@@ -109,6 +146,7 @@ Codraft ships with the [Bonterms Mutual NDA](https://bonterms.com/) as an exampl
 
    Open the `.docx` file in Word, Google Docs, or any compatible application to review the final document.
 
+     ![Screenshot showing the Cowork screen with the a pane on the right showing the rendered contract.](/codraft/images/quickstarts/Quickstart-results.png)
 </Steps>
 
 ## What just happened

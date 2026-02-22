@@ -16,6 +16,18 @@ export default defineConfig({
         { icon: 'github', label: 'GitHub', href: 'https://github.com/houfu/codraft' },
       ],
       favicon: '/favicon.svg',
+      head: [
+        {
+          tag: 'script',
+          attrs: { type: 'module' },
+          content: `
+            import mediumZoom from 'https://esm.run/medium-zoom@1.1.0';
+            const init = () => mediumZoom('.sl-markdown-content img', { background: 'rgba(0,0,0,0.85)' });
+            document.addEventListener('astro:page-load', init);
+            init();
+          `,
+        },
+      ],
       customCss: ['./src/styles/custom.css'],
       sidebar: [
         {
