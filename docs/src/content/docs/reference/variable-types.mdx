@@ -21,7 +21,7 @@ Variables in Codraft have a type that controls how Claude asks for the value dur
 | `*_mobile` | `phone` | |
 | (no match) | `text` | Default for all unrecognised suffixes |
 
-Variables used as `{% if %}` gate conditions are additionally treated as `boolean`, regardless of suffix. Variables used as `{% for %}` collections are treated as list types.
+Variables used **only** as `{% if %}` gate conditions — and never rendered with `{{ }}` — are inferred as `boolean`. If the same variable appears in both a condition and a `{{ }}` reference, its suffix-inferred type applies instead. Variables used as `{% for %}` collections are treated as list types.
 
 ## Explicit types (set in config.yaml)
 
