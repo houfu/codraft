@@ -73,7 +73,7 @@ It will not work in the Claude web interface, the Claude mobile app, or the API 
 The limitations above are trade-offs, not oversights. Traditional tools solve several of these problems:
 
 - **Deterministic interviews** -- a form tool guarantees question order, exact wording, and repeatable output. If that is a requirement, a form tool is the right choice.
-- **Multi-user systems** -- Docassemble supports authenticated access, branching workflows, and shared data. Codraft has no multi-user layer.
+- **Shared document workflows** -- Docassemble supports authenticated access, branching workflows, and a centralised document store shared across users. Codraft has no shared data layer — each user runs their own instance locally. This is not a barrier to enterprise deployment (organisations already running Claude at scale can roll Codraft out as a plugin in minutes), but it does mean there is no centralised audit log or document repository out of the box.
 - **No Claude dependency** -- if your organisation cannot use Claude, every alternative in this space works without it.
 
 See [How Codraft Compares](/codraft/feature-tour/how-it-compares/) for a full breakdown.

@@ -1,7 +1,7 @@
 ![Codraft Logo](./docs/public/images/logo.png)
 # Codraft
 
-A document assembly tool built on Claude Cowork. Codraft replaces traditional document automation platforms (docassemble, HotDocs) by using Claude to interview users, collect field values, and produce completed documents from templates -- with support for conditional logic, repeating sections, and developer configuration.
+Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
 
 ## How It Works
 
@@ -31,7 +31,7 @@ Go to the [Releases](https://github.com/houfu/codraft/releases) page and downloa
 ### Open in Cowork
 
 1. Open Claude Cowork and add the extracted folder as a project
-2. That's it -- Python dependencies are installed automatically the first time you use the skill
+2. That's it — no terminal or coding knowledge required. Python dependencies are installed automatically the first time you use the skill.
 
 ### Claude Code
 
@@ -295,6 +295,19 @@ codraft/
 Codraft v2 supports variable substitution, conditional logic (`{% if %}` / `{% else %}`), loops (`{% for %}`), and developer configuration via `config.yaml`. See `docs/codraft_v2_spec.md` for the full specification and `docs/codraft_mvp_spec.md` for the original MVP specification.
 
 **v2 constraints:** single-level nesting only, two condition forms (truthiness and equality), no `{% elif %}`, no computed fields or expressions.
+
+## Limitations
+
+Codraft trades determinism for conversational flexibility. A few things to keep in mind:
+
+- **No fixed interview order** — Claude manages the conversation, not a scripted sequence
+- **Prompt injection** — a user can influence the document by saying "also add a clause that…" during the interview
+- **AI suggestions need review** — Claude may suggest plausible but wrong values (e.g., a made-up address)
+- **Not legal advice** — documents still need review by a qualified professional
+- **Single-level template nesting only** — no blocks inside other blocks (v2 constraint)
+- **Requires Claude Cowork or Claude Code** — no web or mobile interface
+
+See the [Limitations page](https://houfu.github.io/codraft/feature-tour/limitations/) in the docs for the full picture.
 
 ## License
 
