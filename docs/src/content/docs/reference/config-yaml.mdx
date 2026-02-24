@@ -1,0 +1,208 @@
+---
+title: config.yaml Reference
+description: Complete field-by-field reference for the optional config.yaml template configuration file
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The `config.yaml` file is an optional configuration placed alongside your template. It controls the interview experience without modifying the template itself. The Analyzer merges it into the manifest; the Orchestrator reads only the manifest.
+
+<Aside>
+All sections are optional. You only need to include the fields you want to customize. For a practical guide with examples, see [Configuring with config.yaml](/codraft/guides/config-yaml/).
+</Aside>
+
+## Complete example
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name?"
+    default: ""
+    required: true
+    format_hint: "Full legal name as registered"
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: "bank_transfer"
+  include_ip_assignment:
+    type: boolean
+    question: "Does this engagement involve IP assignment?"
+    default: false
+
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address]
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+  - name: "Milestones"
+    loop: milestones
+    variables: [description, date, amount]
+
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date"
+```
+
+---
+
+## `meta`
+
+*Optional.* Metadata about the template.
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `display_name` | string | No | Human-readable name shown to the user when Claude confirms the matched template. Defaults to the directory name. |
+| `description` | string | No | Short description of the template's purpose. Used internally and may appear in future template directory features. |
+
+```yaml
+meta:
+  display_name: "Consulting Agreement"
+  description: "Standard consulting engagement agreement"
+```
+
+---
+
+## `variables`
+
+*Optional.* A map of variable names to override settings. Only variables that need customization need to be listed here — unlisted variables use defaults inferred from the template.
+
+Each key is a variable name that appears in the template. The value is an object with any combination of the fields below.
+
+### Variable fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label` | string | No | Short label for the variable, shown as a heading for the question. |
+| `question` | string | No | The full question text Claude asks the user. Overrides the auto-generated question. |
+| `default` | any | No | Default value pre-filled during the interview. Use `"today"` for date types to resolve to the current date. |
+| `required` | boolean | No | Whether the variable must be provided. Default: `true`. |
+| `format_hint` | string | No | Additional formatting guidance shown alongside the question. |
+| `type` | string | No | Explicit variable type. See [Variable types](#variable-types) below. If omitted, the type is inferred from the variable name suffix. |
+| `choices` | list | Conditional | List of valid values. **Required** when `type` is `choice`. Ignored otherwise. |
+
+### Variable types
+
+The `type` field accepts the following values:
+
+| Type | Description |
+|------|-------------|
+| `text` | Free text input. The default for most variables. |
+| `date` | A calendar date. The special default `"today"` resolves to the current date. |
+| `number` | A numeric value — currency, quantity, percentage. |
+| `email` | An email address. Validated for email format. |
+| `phone` | A phone number. Accepts international formats. |
+| `boolean` | A yes/no question. Used as the gate for `{% if %}` conditional sections. |
+| `choice` | One of a fixed set of options. Requires the `choices` field. |
+
+If `type` is omitted, it is inferred from the variable name suffix (e.g., `*_date` becomes `date`, `*_email` becomes `email`). See [Variable Type Reference](/codraft/reference/variable-types/) for the full inference table.
+
+### Example
+
+```yaml
+variables:
+  client_name:
+    label: "Client's Legal Name"
+    question: "What is the client's full legal name?"
+    required: true
+    format_hint: "Full legal name as registered"
+
+  effective_date:
+    type: date
+    default: "today"
+
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+    default: bank_transfer
+
+  include_ip_assignment:
+    type: boolean
+    default: false
+    question: "Does this engagement involve IP assignment?"
+```
+
+---
+
+## `groups`
+
+*Optional.* Controls interview grouping and ordering. A list of group objects that batch related variables under a heading and present them together.
+
+Without groups, Claude presents variables one at a time in template order. With groups, related variables are collected together.
+
+### Group fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Display name for the group, shown as a heading during the interview. |
+| `variables` | list | Yes | List of variable names to collect in this group. |
+| `condition` | string | No | Name of a boolean variable. The group is only shown when that variable is `true`. The gate variable must be collected before this group. |
+| `loop` | string | No | Name of a loop collection. The group collects items for that `{% for %}` loop. Must match the collection name in the template (e.g., `milestones` for `{% for milestone in milestones %}`). |
+
+### Basic group
+
+```yaml
+groups:
+  - name: "Parties"
+    variables: [client_name, client_address, consultant_name, consultant_address]
+
+  - name: "Engagement Terms"
+    variables: [effective_date, end_date, governing_law]
+```
+
+### Conditional group
+
+A group gated on a boolean variable. Claude asks the gate question first; if the answer is no, the entire group is skipped.
+
+```yaml
+groups:
+  - name: "IP Assignment"
+    condition: include_ip_assignment
+    variables: [ip_ownership_entity, ip_assignment_date]
+```
+
+### Loop group
+
+A group that maps to a `{% for %}` loop in the template. Claude collects items one at a time, prompting for the sub-fields on each pass.
+
+```yaml
+groups:
+  - name: "Milestones"
+    loop: milestones
+    variables: [description, date, amount]
+```
+
+<Aside>
+The `condition` and `loop` fields can be combined on the same group. In that case, the loop is only presented when the condition is true.
+</Aside>
+
+---
+
+## `validation`
+
+*Optional.* A list of cross-field validation rules evaluated after all values are collected but before rendering. If a rule fails, Claude reports the error message and prompts the user to re-enter the offending values.
+
+### Validation fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `rule` | string | Yes | A Python-style boolean expression using variable names. Evaluated against all collected values. |
+| `message` | string | Yes | Error message shown to the user when the rule evaluates to `false`. |
+
+### Example
+
+```yaml
+validation:
+  - rule: "end_date > effective_date"
+    message: "The end date must be after the effective date."
+
+  - rule: "service_fee > 0"
+    message: "The service fee must be a positive number."
+```
+
+Rules have access to all collected variable values and use Python expression syntax.

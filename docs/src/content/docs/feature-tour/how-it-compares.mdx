@@ -1,0 +1,80 @@
+---
+title: How Codraft Compares
+description: How Codraft differs from Docassemble, HotDocs, Gavel, and other document assembly tools
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Traditional document assembly tools were built for IT departments and law firms with deployment budgets. Codraft is a different point on the trade-off curve: zero infrastructure, AI-generated interviews, standard template formats -- in exchange for less determinism and a dependency on Claude.
+
+## At a glance
+
+|  | Codraft | [Docassemble](https://docassemble.org/) | [HotDocs](https://www.hotdocs.com/) | [Gavel](https://www.gavel.io/) | [Knackly](https://knackly.io/) |
+|---|---|---|---|---|---|
+| **Setup** | Download a zip or one CLI command | Linux server + Docker | Enterprise deployment | SaaS account | SaaS account |
+| **Interview style** | AI conversation | Guided form | Guided form | No-code form builder | Step-by-step form |
+| **Template format** | Word or HTML with Jinja2 placeholders | YAML + Word/PDF | Proprietary Word add-in | Word upload + rules UI | Web UI or Word |
+| **AI involvement** | Generates and conducts the interview | Plugin only | None | Limited | None |
+| **Output formats** | docx, HTML, PDF | PDF, DOCX, and others | DOCX, PDF | DOCX, PDF | DOCX, PDF |
+| **Hosting required** | No | Yes | Yes | No (SaaS) | No (SaaS) |
+| **Multi-user access** | No | Yes | Yes | Yes | Yes |
+| **Audit trail** | No | Yes | Yes | Yes | Yes |
+| **Role management** | No | Yes | Yes | Yes | Yes |
+| **SSO / enterprise auth** | No | Configurable | Yes | Yes | Yes |
+| **API / integrations** | Via MCP ¹ | API + webhooks | Enterprise API | Webhooks + Zapier | API |
+| **Pricing** | Free | Free + hosting costs | $25--99+/user/mo | Custom/enterprise | $209--834/mo |
+| **Requires Claude** | Yes | No | No | No | No |
+
+¹ Codraft has no built-in integrations of its own. Because it runs inside Claude, it can use any [MCP](https://modelcontextprotocol.io/) server configured in your Claude environment during the interview — giving it access to CRMs, databases, document stores, and other tools without any integration work on Codraft's part.
+
+## Tool by tool
+
+### Docassemble
+
+Docassemble is the most capable open-source document assembly tool available. It handles complex multi-user workflows, branching logic, authenticated access, and production-scale deployments.
+
+The trade-off is infrastructure. Docassemble requires a Linux server running Docker, ongoing maintenance, and a developer to author the interview YAML separately from the template. It is two parallel projects: the template and the interview that drives it.
+
+Codraft drew direct inspiration from Docassemble. If you are building a production system for a legal aid organisation, government agency, or law school -- one that needs authenticated users, shared data, and guaranteed question order -- Docassemble is likely the right choice.
+
+### HotDocs
+
+HotDocs is the established enterprise standard. It has deep Microsoft Word integration, a mature authoring environment, and a large ecosystem of existing templates. It has been in continuous use in law firms and corporate legal departments for decades.
+
+The trade-off is cost and lock-in. Per-user licensing adds up quickly, and templates are built with the HotDocs Author add-in in a proprietary format. Migrating away from HotDocs means rebuilding those templates.
+
+Codraft templates are standard Word files with plain Jinja2 placeholders. If you switch tools later, you keep your templates.
+
+### Gavel (formerly Documate)
+
+Gavel is a cloud SaaS platform with a no-code form builder. You upload a Word document, mark up the variable fields through a browser UI, and publish a web form. It requires no technical skills to set up a basic document.
+
+Two things to keep in mind. First, the interview is a traditional web form -- not a conversation. Fixed questions, fixed order. Second, documents are processed on Gavel's servers. Document content, variable values, and templates are transmitted to and stored by the service.
+
+See the [Security and Privacy](/codraft/feature-tour/security/) page if data residency is a consideration.
+
+### Knackly and Bryter
+
+Both are SaaS platforms aimed at teams with budgets to match: Knackly starts at around $209/mo, Bryter is priced for enterprise. Both use form-based interviews -- neither generates questions from the template using AI.
+
+Bryter has added generative AI workflow features, but interview generation from a template is not one of them. Worth evaluating for multi-user workflows, audit trails, and enterprise SSO requirements.
+
+## When Codraft fits
+
+- Automating a handful of document types for personal or small-team use
+- Zero infrastructure -- no server, no SaaS account, no subscription
+- Comfortable using Claude Cowork or Claude Code as your working environment
+- Templates are Word or HTML files you want to keep in a portable format
+- An AI-conducted conversation (rather than a deterministic form) is acceptable
+
+## When Codraft is not the right fit
+
+- Regulated intake forms requiring exact question order and wording
+- Building a system for end users who do not have Claude Cowork or Claude Code
+- Multi-user access, role management, or audit trails required
+- Your organisation cannot send document data through a Claude session
+- You need `{% elif %}`, nested blocks, or computed fields (on the roadmap, not available yet)
+
+<Aside type="tip">
+  The [Limitations](/codraft/feature-tour/limitations/) page covers Codraft's specific technical and safety constraints in detail.
+</Aside>

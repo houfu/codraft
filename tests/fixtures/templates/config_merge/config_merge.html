@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Client: {{ client_name }}</p>
+<p>Method: {{ payment_method }}</p>
+<p>Start: {{ start_date }}</p>
+<p>Notes: {{ notes }}</p>
+
+{% if include_nda %}
+<p>NDA Entity: {{ nda_entity }}</p>
+{% endif %}
+
+{% for task in tasks %}
+<p>Task: {{ task.description }} — {{ task.amount }}</p>
+{% endfor %}
+</body>
+</html>

@@ -3,13 +3,17 @@ title: Codraft
 description: Document assembly tool for Claude Cowork
 template: splash
 hero:
-  tagline: Intelligent document assembly for legal and business professionals
+  tagline: Document assembly through conversation — for people already working with Claude and AI
   actions:
     - text: Get Started
-      link: /getting-started/
+      link: /codraft/start-here/introduction/
       icon: right-arrow
       variant: primary
-    - text: View on GitHub
+    - text: Feature Tour
+      link: /codraft/feature-tour/easy-to-install/
+      icon: rocket
+      variant: secondary
+    - text: GitHub
       link: https://github.com/houfu/codraft
       icon: external
 ---
@@ -23,7 +27,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     Place a `.docx` or `.html` template in `templates/`, using `{{ variable_name }}` placeholders wherever you need dynamic content.
   </Card>
   <Card title="2. Claude Interviews You" icon="puzzle">
-    Tell Claude to "prepare a [document type]". Claude finds the template, extracts all variables, and walks you through a conversational interview — skipping irrelevant sections automatically.
+    Tell Claude to "prepare a [document type]". Claude finds the template and walks you through a natural conversation — skipping irrelevant sections, letting you answer in any order, and collecting lists with an "add another?" flow.
   </Card>
   <Card title="3. Get Your Document" icon="approve-check">
     After confirming all values, the completed document is rendered and saved to `output/`. Docx templates produce `.docx` files; HTML templates produce both `.html` and `.pdf`.
@@ -33,16 +37,16 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 ## Features
 
 <CardGrid>
+  <Card title="Natural Conversation" icon="comment">
+    Claude interviews you — not a form. Handle messy input, point to documents or photos instead of typing, change your mind mid-way. Ambiguity becomes dialogue, not an error.
+  </Card>
+  <Card title="Zero Infrastructure" icon="laptop">
+    No server. No database. For individuals, Codraft runs inside Claude with nothing to host. For organisations deploying Claude at scale, it ships as a Claude Code plugin and rolls out in minutes.
+  </Card>
   <Card title="Conditional Logic" icon="setting">
     Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers. The interview skips irrelevant questions automatically.
   </Card>
   <Card title="Repeating Sections" icon="list-format">
     Use `{% for item in items %}` loops for line items, milestones, or any repeating content. Claude collects entries one at a time with a natural "add another?" flow.
-  </Card>
-  <Card title="Two Template Formats" icon="seti:html">
-    Docx templates render to Word documents via `docxtpl`. HTML templates render to both HTML and PDF via `jinja2` and `weasyprint`.
-  </Card>
-  <Card title="Developer Configuration" icon="seti:yaml">
-    Add an optional `config.yaml` to customise question labels, set defaults, define choices, group related fields, and add validation rules — without touching the template.
   </Card>
 </CardGrid>

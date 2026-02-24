@@ -1,0 +1,79 @@
+---
+title: Limitations
+description: When Codraft is the wrong tool, and what it can't do yet
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Codraft's strengths come from using Claude to conduct the interview. Its limitations do too. Here is what to understand before you rely on it.
+
+## Developers have limited control over the interview
+
+Codraft's interview is driven by Claude, not by a fixed script. A `config.yaml` lets template authors customize question text, groupings, defaults, and validation — but it does not lock Claude into a specific sequence or phrasing. Claude may rephrase questions, combine related ones, or adapt based on how the conversation unfolds.
+
+This means no two interviews are identical. Run the same template twice and you may get different question groupings, a different order, and different phrasing — even with the same `config.yaml` in place. The variables collected will be the same, but the path to collecting them will not.
+
+If your use case requires a precise, repeatable interview with guaranteed question order and exact wording — a compliance checklist, an onboarding script, a regulated intake form — Codraft is not the right fit. A deterministic form tool will serve you better.
+
+## The output is shaped by the conversation, not just the template
+
+Because the interview is a conversation, users can push back, suggest changes, and ask Claude to adapt the document. Claude will consider those requests. That flexibility is a feature for most uses, but it means the rendered document reflects the entire conversation — not only what the template author intended.
+
+Consider this scenario: a landlord uses Codraft to prepare a standard tenancy agreement. During the interview, the prospective tenant says: "We agreed there would be no late payment penalty — can you remove that clause?" Claude, being conversational and helpful, may comply. The template author's intent is overridden by the user's input.
+
+This is a form of **prompt injection**. In a deterministic form, user input is data — it fills fields, nothing more. In a Claude conversation, user input is part of the prompt. A user who knows this can craft their answers to influence the document well beyond what the template author intended — removing clauses, softening terms, or inserting language that was never in the template.
+
+Codraft can be used for official documents and contracts, but it should never be the only step in the process. Anyone relying on such a document — to sign a lease, execute a contract, or submit a filing — must review the output before doing so. Codraft is a drafting aid, not a certified document generator.
+
+## Hallucination is largely prevented by design
+
+Codraft's pipeline is structured to reduce the risk of Claude inventing document content:
+
+- **The Analyzer extracts variables by regex**, not inference — the manifest only contains placeholders that literally appear in the template.
+- **The Orchestrator collects a value for each variable** from the user during the interview.
+- **The Renderer does deterministic substitution** — it replaces placeholders with what was collected, nothing more.
+
+This means hallucination is largely contained, but not impossible. During the interview, Claude may suggest a value — offer to fill in a detail, complete a partial answer, or propose a sensible default — and the user may accept it without scrutinising it closely. That suggestion could be wrong: a plausible-sounding jurisdiction, a fee structure that doesn't quite match what was discussed, a date in the wrong year. It will pass through the confirmation step and appear in the rendered document, because the confirmation reflects what Claude collected, not what you originally said.
+
+Read the rendered document in full before treating it as final, particularly any value that Claude suggested rather than you typed.
+
+## Claude is not a lawyer
+
+Codraft can produce documents that look professionally drafted and legally complete. Claude is conversant with common legal language and can handle standard templates competently. But it is not a lawyer, and it does not know your jurisdiction, the current state of the law, or the specific circumstances of your situation.
+
+A template might be out of date. A clause might be unenforceable in your jurisdiction. A standard term might interact with local law in a way neither you nor Claude anticipated. Claude will not flag any of this — it will fill the template and produce a document that reads well, even if the legal effect is not what you intended.
+
+For documents with real legal consequences — contracts, leases, employment agreements, IP assignments — have them reviewed by a qualified legal professional before you rely on them.
+
+## Template constraints (v2)
+
+These are the current technical limits of the template engine:
+
+- **Single-level nesting only** — `{% for %}` inside `{% if %}` (or vice versa) is not supported. Each control structure must stand on its own.
+- **Two condition forms only** — `{% if variable %}` (truthiness) and `{% if variable == 'value' %}` (equality). No `{% elif %}`, no `and`/`or`, no complex expressions.
+- **No computed fields** — every value is collected from the user. You cannot derive one variable from another inside the template.
+- **No Jinja2 expressions** — filters, math, and string manipulation are not supported. Variables are substituted as-is.
+
+<Aside type="tip" title="Looking ahead">
+The template constraints are v2 limits. Nested blocks, `elif` support, and computed fields are on the roadmap. Check the [Roadmap](/reference/roadmap/) for what is planned.
+</Aside>
+
+## Requires a compatible client
+
+Codraft runs as Claude skills, which means it needs a client that supports them. Currently that means:
+
+- **Claude Cowork** (Anthropic's native desktop client)
+- **Claude Code** (CLI-based development environment)
+- **OpenCode** or other Claude Code-compatible clients
+
+It will not work in the Claude web interface, the Claude mobile app, or the API directly.
+
+## Where traditional tools have the advantage
+
+The limitations above are trade-offs, not oversights. Traditional tools solve several of these problems:
+
+- **Deterministic interviews** -- a form tool guarantees question order, exact wording, and repeatable output. If that is a requirement, a form tool is the right choice.
+- **Shared document workflows** -- Docassemble supports authenticated access, branching workflows, and a centralised document store shared across users. Codraft has no shared data layer — each user runs their own instance locally. This is not a barrier to enterprise deployment (organisations already running Claude at scale can roll Codraft out as a plugin in minutes), but it does mean there is no centralised audit log or document repository out of the box.
+- **No Claude dependency** -- if your organisation cannot use Claude, every alternative in this space works without it.
+
+See [How Codraft Compares](/codraft/feature-tour/how-it-compares/) for a full breakdown.

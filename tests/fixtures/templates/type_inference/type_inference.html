@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>
+<p>Client: {{ client_name }}</p>
+<p>Address: {{ client_address }}</p>
+<p>Date: {{ effective_date }}</p>
+<p>Email: {{ client_email }}</p>
+<p>Fee: {{ service_fee }}</p>
+<p>Phone: {{ contact_phone }}</p>
+<p>Law: {{ governing_law }}</p>
+
+{% if include_warranty %}
+<p>Warranty Terms: {{ warranty_terms }}</p>
+{% endif %}
+
+{% for item in line_items %}
+<p>{{ item.description }} — {{ item.amount }}</p>
+{% endfor %}
+</body>
+</html>

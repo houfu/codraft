@@ -1,0 +1,47 @@
+---
+title: "Install: Claude Code"
+description: Add Codraft to Claude Code with one command
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+<Aside type="note">
+  The canonical Codraft setup is Claude Cowork with the folder download -- no terminal required. This page covers installation for users who prefer to work in Claude Code.
+</Aside>
+
+## Prerequisites
+
+You need the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed and authenticated.
+
+## Installation
+
+<Steps>
+
+1. **Install the plugin**
+
+   Run the following command in your terminal:
+
+   ```bash
+   /plugin marketplace add houfu/codraft
+   ```
+
+2. **Verify the install**
+
+   Run `/skills` in Claude Code and confirm that `codraft` appears in the list of available skills.
+
+3. **Run your first document**
+
+   Tell Claude: *"Prepare a mutual NDA"*
+
+   Claude should find the bundled Bonterms Mutual NDA template and start the interview.
+
+</Steps>
+
+<Aside type="tip">
+On the first run, Claude installs the required Python packages (`docxtpl`, `pyyaml`, `jinja2`, `weasyprint`) automatically. This takes about 30 seconds and only happens once.
+</Aside>
+
+## Next steps
+
+- [Quickstart](/codraft/start-here/quickstart/) -- prepare your first document in under five minutes
+- [Feature Tour](/codraft/feature-tour/easy-to-install/) -- see what Codraft can do

@@ -1,0 +1,38 @@
+meta:
+  display_name: "Config Merge Test"
+  description: "Tests that all config sections merge correctly"
+
+variables:
+  client_name:
+    label: "Client's Full Legal Name"
+    question: "What is the client's full legal name?"
+    required: true
+    format_hint: "Full legal name as registered"
+  payment_method:
+    type: choice
+    choices:
+      - bank_transfer
+      - cheque
+      - crypto
+    default: "bank_transfer"
+  include_nda:
+    type: boolean
+    question: "Does this engagement require an NDA?"
+    default: false
+  start_date:
+    type: date
+    default: "today"
+
+groups:
+  - name: "Client Details"
+    variables: [client_name, payment_method]
+  - name: "NDA"
+    condition: include_nda
+    variables: [nda_entity]
+  - name: "Tasks"
+    loop: tasks
+    variables: [description, amount]
+
+validation:
+  - rule: "start_date is not None"
+    message: "Start date is required"

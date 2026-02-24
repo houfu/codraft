@@ -652,8 +652,8 @@ def make_label(name):
     return name.replace("_", " ").title()
 
 
-def build_var_entry(name):
-    return {"name": name, "label": make_label(name), "type": infer_type(name)}
+def build_var_entry(name, infer_name=None):
+    return {"name": name, "label": make_label(name), "type": infer_type(infer_name or name)}
 
 
 # Build final variable lists
@@ -666,7 +666,10 @@ for cond in conditionals:
     ]
 
 for loop in loops:
-    loop["variables"] = [build_var_entry(v["name"]) for v in loop["variables"]]
+    loop["variables"] = [
+        build_var_entry(v["name"], f"{loop['loop_var']}_{v['name']}")
+        for v in loop["variables"]
+    ]
     loop["label"] = make_label(loop["collection"]).rstrip("s")
     loop["min_items"] = 1
 

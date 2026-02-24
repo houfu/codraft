@@ -45,10 +45,17 @@ jobs:
       - name: Package plugin ZIP
         run: zip -r "codraft-plugin-v${VERSION}.zip" plugin/
 
+      - name: Create latest-named aliases
+        run: |
+          cp "codraft-v${VERSION}.zip" codraft-latest.zip
+          cp "codraft-plugin-v${VERSION}.zip" codraft-plugin-latest.zip
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{ env.ZIP_NAME }}
             codraft-plugin-v${{ env.VERSION }}.zip
+            codraft-latest.zip
+            codraft-plugin-latest.zip
           generate_release_notes: true

@@ -1,0 +1,82 @@
+---
+title: "Install: Claude Cowork"
+description: Add Codraft to Claude Cowork using the folder method or plugin marketplace
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+You need a [Claude Cowork](https://claude.ai) account. No other software is required -- Python dependencies are installed automatically the first time you run a skill.
+
+## Choose your install method
+
+<Tabs>
+<TabItem label="Folder (Download)">
+
+Download the latest release and open it as a Cowork project.
+
+<Steps>
+
+1. **Download the release**
+
+   Download the latest release directly:
+
+   **[⬇ Download codraft-latest.zip](https://github.com/houfu/codraft/releases/latest/download/codraft-latest.zip)**
+
+2. **Extract the archive**
+
+   Unzip the file to a folder of your choice. Your Documents folder works well.
+
+3. **Open the folder in Cowork**
+
+   In Claude Cowork, create a new project. When prompted for a project folder, select the extracted `codraft/` directory.
+
+   Cowork loads `CLAUDE.md` as project context and makes the Codraft skills available automatically.
+
+4. **Verify the install**
+
+   Tell Claude: *"Prepare a mutual NDA"*
+
+   Claude should find the bundled Bonterms Mutual NDA template and start the interview.
+
+</Steps>
+
+</TabItem>
+<TabItem label="Plugin">
+
+<Aside type="caution">
+The Cowork Plugin Marketplace is not yet widely available. If you do not see a Plugin Marketplace option in your Cowork UI, use the **Folder (Download)** method above instead.
+</Aside>
+
+Install directly from the Cowork Plugin Marketplace.
+
+<Steps>
+
+1. **Open the Plugin Marketplace**
+
+   In Claude Cowork, navigate to the Plugin Marketplace.
+
+2. **Search for Codraft**
+
+   Search for `houfu/codraft` and click **Install**.
+
+3. **Verify the install**
+
+   Tell Claude: *"Prepare a mutual NDA"*
+
+   Claude should find the bundled Bonterms Mutual NDA template and start the interview.
+
+</Steps>
+
+</TabItem>
+</Tabs>
+
+<Aside type="tip">
+When Codraft runs, Claude installs any missing Python packages (`docxtpl`, `pyyaml`, `jinja2`, `weasyprint`) automatically. The first install takes about 30 seconds; after that, packages are cached locally.
+</Aside>
+
+## Next steps
+
+- [Quickstart](/codraft/start-here/quickstart/) -- prepare your first document in under five minutes
+- [Feature Tour](/codraft/feature-tour/easy-to-install/) -- see what Codraft can do

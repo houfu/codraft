@@ -1,0 +1,115 @@
+---
+title: Variable Type Reference
+description: Complete reference for all variable types — inferred and explicit
+---
+
+Variables in Codraft have a type that controls how Claude asks for the value during the interview. Types are either inferred automatically from the variable name, or declared explicitly in `config.yaml`.
+
+## Inferred types (from name suffix)
+
+| Name suffix | Inferred type | Notes |
+|------------|--------------|-------|
+| `*_name` | `text` | |
+| `*_address` | `text` | Presented as multi-line input |
+| `*_date` | `date` | Accepts `"today"` as a default value in config |
+| `*_email` | `email` | Validated for email format |
+| `*_amount` | `number` | |
+| `*_price` | `number` | |
+| `*_fee` | `number` | |
+| `*_phone` | `phone` | |
+| `*_tel` | `phone` | |
+| `*_mobile` | `phone` | |
+| (no match) | `text` | Default for all unrecognised suffixes |
+
+Variables used **only** as `{% if %}` gate conditions — and never rendered with `{{ }}` — are inferred as `boolean`. If the same variable appears in both a condition and a `{{ }}` reference, its suffix-inferred type applies instead. Variables used as `{% for %}` collections are treated as list types.
+
+## Explicit types (set in config.yaml)
+
+Use the `type` field in `config.yaml` to override the inferred type or to set a type not expressible through naming:
+
+```yaml
+variables:
+  payment_method:
+    type: choice
+    choices: [bank_transfer, cheque, crypto]
+```
+
+### `text`
+
+Free text input. The default type. No format validation.
+
+```yaml
+governing_law:
+  type: text
+  label: "Governing Law"
+```
+
+### `date`
+
+A calendar date. The special default value `"today"` resolves to the current date at interview time.
+
+```yaml
+effective_date:
+  type: date
+  default: "today"
+```
+
+### `number`
+
+A numeric value — currency amounts, quantities, percentages. Accepts decimal values.
+
+```yaml
+service_fee:
+  type: number
+  label: "Service Fee (SGD)"
+```
+
+### `email`
+
+An email address. Claude validates the format before accepting.
+
+```yaml
+client_email:
+  type: email
+```
+
+### `phone`
+
+A phone number. Accepts international formats.
+
+```yaml
+contact_phone:
+  type: phone
+```
+
+### `boolean`
+
+A yes/no question. Used as the gate for `{% if %}` conditional sections. Claude presents this as a yes/no choice.
+
+```yaml
+include_ip_assignment:
+  type: boolean
+  default: false
+  question: "Does this engagement involve IP assignment?"
+```
+
+### `choice`
+
+One of a fixed set of options. Claude presents the choices as a list; the user selects one.
+
+```yaml
+payment_method:
+  type: choice
+  choices: [bank_transfer, cheque, crypto]
+  default: bank_transfer
+```
+
+The selected value is substituted as a plain string into the template. For equality conditions (`{% if payment_method == 'bank_transfer' %}`), the value must match exactly.
+
+## How types affect rendering
+
+Types do not change how the value is inserted into the template — all values are substituted as strings. Types only affect:
+
+1. **How Claude asks the question** — the input format and validation applied during the interview
+2. **How defaults behave** — `"today"` is only meaningful for `date` types
+3. **What the manifest records** — for downstream tooling and validation

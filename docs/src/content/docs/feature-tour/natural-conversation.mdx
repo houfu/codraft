@@ -1,0 +1,150 @@
+---
+title: It's Just a Conversation
+description: Why a Claude interview feels nothing like filling out a guided form
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+A guided interview asks a fixed sequence of questions, each answer feeding into a predetermined next step. The system only understands inputs it was programmed to handle. You adapt to it.
+
+Codraft works the other way around. Claude understands language, context, and intent — so the interview adapts to you.
+
+<Aside type="note">
+  Every tool in this space -- Docassemble, HotDocs, Gavel, Knackly -- conducts the interview as a guided form: fixed questions, fixed order, one field at a time. The conversational approach is specific to Codraft.
+</Aside>
+
+## You do not have to follow the order
+
+A deterministic system asks question 4 only after questions 1, 2, and 3. Claude does not care. Give everything at once, skip around, or answer in whatever order matches how the information is in front of you.
+
+```
+Claude: Let's start with the parties. What are the client and consultant details?
+You:    Consultant is Sarah Chen, sarah@example.com.
+        I'll get the client details in a moment — can we do the payment terms first?
+Claude: Of course. What are the payment terms?
+```
+
+Claude holds what it has and picks up the rest later.
+
+## Real-world input is messy — Claude handles it
+
+A form field expects clean input. It does not know what to do with `O'Brien & Associates (trading as)` or an address pasted from Google Maps with extra line breaks. It rejects, errors, or silently strips.
+
+Claude reads intent. Punctuation, formatting, abbreviations, and context clues are not problems to work around — they are just part of the message.
+
+```
+You:    Client is John O'Brien t/a O'Brien & Associates —
+        1 Raffles Quay #12-00, Singapore 048583.
+        ABN or UEN: 201234567K
+Claude: Got it. I'll use "John O'Brien trading as O'Brien & Associates"
+        as the client name, with the Singapore address and UEN 201234567K.
+```
+
+## Point to a source instead of typing
+
+You do not have to type out everything from scratch. Paste a URL, share a screenshot, or photograph a namecard and hand it over.
+
+```
+You:    [attaches photo of business card]
+        Use this for the client details.
+Claude: I can see: TechCorp Pte Ltd, James Lim, james@techcorp.sg,
+        10 Anson Road, Singapore. Using these for the client section.
+```
+
+A form cannot do this. It has no idea what a namecard is.
+
+<Aside>
+  Claude supports image understanding, web fetch, and search. Whether these are available depends on which client you are using -- check your client's documentation to confirm what is exposed in your setup.
+</Aside>
+
+## Ambiguity becomes dialogue, not an error
+
+When something is unclear, a deterministic system either rejects the answer or makes a silent wrong assumption. Claude asks.
+
+```
+You:    The payment is net 30, standard terms.
+Claude: I'll set the payment period to 30 days from invoice date —
+        is that right, or is it 30 days from end of month?
+You:    From invoice date is fine.
+```
+
+And when a question is unclear to *you*, ask back.
+
+```
+You:    What do you mean by "effective date"? When we sign or when work starts?
+Claude: Either works — it is the date the agreement comes into force.
+        Most people use the signing date, but you can set it to whenever
+        you have agreed work begins.
+```
+
+## Delegate where you can
+
+A deterministic system blocks on every required field until you supply an exact answer. Claude can make an informed suggestion and let you confirm.
+
+```
+You:    Use whatever the standard governing law clause is for this kind of agreement.
+Claude: For a Singapore consulting agreement, the standard is Singapore law
+        with disputes resolved by Singapore courts. Shall I use that?
+You:    Yes.
+```
+
+## Change your mind freely
+
+In a form-based tool, going back means navigating to a previous screen — if the tool even allows it. In a conversation, you just say so.
+
+```
+You:    Actually, the start date should be March 15, not March 1.
+        And the client address has changed — new address is 80 Robinson Road.
+Claude: Updated. Start date is now 15 March 2026 and client address
+        is 80 Robinson Road.
+```
+
+## Collecting repeating items feels natural too
+
+When a template has a repeating section — milestones, line items, attendees — Claude collects them one at a time, then asks if you want to add more. Form-based tools make you click "Add row" and fill in a table. Claude just asks.
+
+```
+Claude: Let's add the project milestones. What's the first one?
+You:    Design phase, due March 15, $5,000.
+Claude: Got it. Milestone 1: Design phase, 15 March 2026, $5,000.
+        Would you like to add another milestone?
+You:    Yes — Development, due April 30, $10,000.
+Claude: Milestone 2: Development, 30 April 2026, $10,000.
+        Another?
+You:    No, that's it.
+Claude: Two milestones noted. Moving on.
+```
+
+The result is a list that feeds directly into the `{% for %}` loop in the template.
+
+## Review before you commit
+
+Once the interview is complete, Codraft shows you everything it collected before rendering — grouped by section, with loop items numbered and any skipped conditional sections marked as not applicable. You can edit any value before the document is produced.
+
+```
+Claude: Here's what I have — let me know if anything needs changing:
+
+  Parties
+    Client: TechCorp Pte Ltd
+    Consultant: Sarah Chen
+
+  Milestones
+    1. Design phase — 15 March 2026 — $5,000
+    2. Development — 30 April 2026 — $10,000
+
+  IP Assignment
+    (Skipped — not applicable)
+
+Does this look right, or would you like to change anything?
+
+You:    The consultant email is missing — it's sarah@example.com.
+Claude: Added. Anything else?
+You:    No, looks good.
+Claude: Rendering your document now.
+```
+
+Nothing is written to disk until you confirm. If you spot an error, you correct it in conversation — no re-filling forms, no navigating back through screens.
+
+---
+
+The trade-off is that a conversation is less predictable than a form. The [Limitations](/codraft/feature-tour/limitations/) page covers what Codraft cannot do. But for the interview itself, the lack of rigid determinism is the point.
