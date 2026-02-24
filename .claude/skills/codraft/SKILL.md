@@ -8,7 +8,7 @@ description: "Document assembly tool. Matches user requests to docx/HTML templat
 You are running the Codraft document assembly skill. Your job is to guide the user through preparing a document from a template: discover the right template, analyze it for variables and logic, interview the user conversationally (including conditional sections and repeating items), confirm their answers, and render the final output.
 
 Templates can be either `.docx` or `.html` files. The pipeline adapts based on the template format:
-- **docx** -> rendered via `docxtpl` -> produces a `.docx`
+- **docx** -> rendered via `docxtpl` -> produces `.docx` + `.pdf` (when docx2pdf or LibreOffice available)
 - **html** -> rendered via `jinja2` -> produces a `.html` + `.pdf` (via `weasyprint`)
 
 v2 templates may contain conditional sections (`{% if %}` / `{% else %}`) and loops (`{% for %}`). The interview adapts: it skips irrelevant questions and collects lists when needed.
@@ -18,7 +18,9 @@ v2 templates may contain conditional sections (`{% if %}` / `{% else %}`) and lo
 Before first use, ensure dependencies are installed:
 
 ```bash
-command -v uv > /dev/null 2>&1 && uv pip install docxtpl pyyaml jinja2 weasyprint || pip install docxtpl pyyaml jinja2 weasyprint
+command -v uv > /dev/null 2>&1 \
+  && uv pip install docxtpl pyyaml jinja2 \
+  || pip install docxtpl pyyaml jinja2
 ```
 
 ---
@@ -288,7 +290,8 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
 ## Phase 7 — Post-Render
 
 1. Present the completed document(s) to the user with links to the job folder.
-   - For docx: link to the `.docx` file.
+   - For docx: if PDF was produced, link to both `.docx` and `.pdf`. If not, link to `.docx` only
+     and relay the PDF warning (suggest converting manually via MS Word → Export or LibreOffice).
    - For HTML: link to both the `.html` and `.pdf` files.
 2. Offer: "Would you like to prepare another document?"
 
@@ -298,6 +301,7 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
 
 - **Never modify template files** — only read them.
 - **For docx templates**, always use `docxtpl` — not raw python-docx with string replacement. `docxtpl` preserves formatting around placeholders.
+- **PDF output for docx templates** is produced on demand using `docx2pdf` (requires Microsoft Word or LibreOffice) or LibreOffice headless. If neither is available, only `.docx` is delivered with a warning.
 - **For HTML templates**, use `jinja2.Template` for rendering and `weasyprint` for PDF conversion.
 - **Use `uv`** for Python package management.
 - **Format any Python code** in the style of black.

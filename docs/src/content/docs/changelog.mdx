@@ -3,6 +3,14 @@ title: Changelog
 description: Version history for Codraft
 ---
 
+## v0.2.1 — Modular renderer, PDF output for docx (February 2026)
+
+**New features:**
+- PDF output for `.docx` templates — produced automatically when Microsoft Word (`docx2pdf`) or LibreOffice is available; soft-fails with a warning if neither is found
+- On-demand dependency installation — `docx2pdf` is installed only for docx jobs, `weasyprint` only for HTML jobs; no unnecessary packages loaded
+
+---
+
 ## v0.2 — Codraft v2 (February 2026)
 
 **New features:**
