@@ -11,6 +11,8 @@ Templates authored as `.docx` files produce polished Word documents. Codraft use
 
 Your formatting stays intact -- bold text stays bold, tables keep their borders, and page breaks remain where you put them.
 
+When Microsoft Word or LibreOffice is available on your machine, Codraft also produces a `.pdf` alongside the `.docx` automatically. If neither is installed, you receive the `.docx` with a note explaining how to convert it manually.
+
 ## HTML and PDF
 
 Templates authored as `.html` files produce two outputs: the rendered HTML file and a PDF generated from it via WeasyPrint. You get both automatically, no extra steps required.
@@ -25,6 +27,7 @@ Every rendering job creates its own folder inside `output/`, named with the temp
 output/
   consulting_agreement_acmepteltd_2026-03-01/
     consulting_agreement_acmepteltd_2026-03-01.docx
+    consulting_agreement_acmepteltd_2026-03-01.pdf   ← when Word or LibreOffice available
 ```
 
 For HTML templates, you get both files in the same folder:

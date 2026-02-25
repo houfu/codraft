@@ -38,7 +38,7 @@ Each template lives in its own directory under `templates/`. The directory name 
 
 | Format | Engine | Output |
 |--------|--------|--------|
-| `.docx` | `docxtpl` | `.docx` |
+| `.docx` | `docxtpl` | `.docx` + `.pdf` (when `docx2pdf` or LibreOffice available) |
 | `.html` | `jinja2` | `.html` + `.pdf` (via `weasyprint`) |
 
 Both formats use the same Jinja2-style syntax for placeholders, conditionals, and loops.

@@ -18,10 +18,46 @@ This skill is called by the Codraft orchestrator. You receive:
 
 ## Prerequisites
 
-Ensure dependencies are installed:
+Ensure core rendering dependencies are installed:
 
 ```bash
-command -v uv > /dev/null 2>&1 && uv pip install docxtpl pyyaml jinja2 weasyprint || pip install docxtpl pyyaml jinja2 weasyprint
+command -v uv > /dev/null 2>&1 \
+  && uv pip install docxtpl pyyaml jinja2 \
+  || pip install docxtpl pyyaml jinja2
+```
+
+---
+
+## Step 0 — Determine Output Plan
+
+Before preparing the context, determine what output formats are required based on the template format and any user/orchestrator instructions:
+- DOCX template → always produce `.docx`; produce `.pdf` if requested (default: yes)
+- HTML template → always produce `.html`; always produce `.pdf` via weasyprint
+
+Install the appropriate on-demand tools:
+
+```python
+import subprocess, sys, shutil
+
+# Determined from template format + user intent
+outputs_requested = ["docx", "pdf"]  # adjust as needed
+template_format = "docx"  # or "html"
+
+
+def install(package: str):
+    subprocess.run(
+        ["uv", "pip", "install", package]
+        if shutil.which("uv")
+        else [sys.executable, "-m", "pip", "install", package],
+        check=True,
+    )
+
+
+if "pdf" in outputs_requested and template_format == "docx":
+    install("docx2pdf")
+
+if template_format == "html":
+    install("weasyprint")
 ```
 
 ---
@@ -68,7 +104,8 @@ Each rendering job gets its own folder inside `output/`:
 ```
 output/
 └── consulting_agreement_techcorp_2026-02-17/
-    └── consulting_agreement_techcorp_2026-02-17.docx
+    ├── consulting_agreement_techcorp_2026-02-17.docx
+    └── consulting_agreement_techcorp_2026-02-17.pdf   ← when tooling available
 
 output/
 └── event_invitation_annual_gala_2026-02-17/
@@ -98,12 +135,18 @@ context = {
 }
 doc.render(context)
 
-# Build job folder and filename
+# Build job folder and filename — deduplicate if a same-named folder already exists
 key_var = context.get("<most_identifying_variable>", "document")
 slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+base_job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+job_name = base_job_name
 job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
+counter = 2
+while os.path.exists(job_dir):
+    job_name = f"{base_job_name}_{counter}"
+    job_dir = os.path.join(output_dir, job_name)
+    counter += 1
+os.makedirs(job_dir)
 
 output_path = os.path.join(job_dir, f"{job_name}.docx")
 doc.save(output_path)
@@ -112,7 +155,69 @@ print(f"Saved: {output_path}")
 
 **Note:** `docxtpl` natively supports Jinja2 `{% if %}`, `{% else %}`, `{% endif %}`, `{% for %}`, and `{% endfor %}` tags. No special handling is needed — just pass the context with correctly-typed values.
 
+#### DOCX → PDF conversion (on demand)
+
+After saving the `.docx`, attempt PDF conversion using two strategies (soft-fail — always deliver the `.docx` even if PDF fails):
+
+```python
+import subprocess
+
+pdf_path = os.path.join(job_dir, f"{job_name}.pdf")
+pdf_produced = False
+pdf_warning = None
+
+# Attempt 1: docx2pdf (MS Word on macOS/Windows, LibreOffice on Linux)
+try:
+    import docx2pdf
+
+    docx2pdf.convert(output_path, pdf_path)
+    print(f"Saved PDF: {pdf_path}")
+    pdf_produced = True
+except Exception as e:
+    pdf_warning = f"docx2pdf conversion failed: {e}"
+
+# Attempt 2: LibreOffice headless subprocess (fallback)
+if not pdf_produced:
+    try:
+        result = subprocess.run(
+            [
+                "soffice",
+                "--headless",
+                "--convert-to",
+                "pdf",
+                "--outdir",
+                job_dir,
+                output_path,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        if result.returncode == 0 and os.path.exists(pdf_path):
+            print(f"Saved PDF (via LibreOffice): {pdf_path}")
+            pdf_produced = True
+            pdf_warning = None
+        else:
+            pdf_warning = f"LibreOffice failed (exit {result.returncode}): {result.stderr.strip()}"
+    except FileNotFoundError:
+        pdf_warning = (
+            "PDF conversion unavailable: neither docx2pdf nor LibreOffice (soffice) found. "
+            "Install one to enable PDF output."
+        )
+    except subprocess.TimeoutExpired:
+        pdf_warning = "LibreOffice conversion timed out after 60 seconds."
+    except Exception as e:
+        pdf_warning = f"LibreOffice conversion failed: {e}"
+
+if not pdf_produced and pdf_warning:
+    print(f"WARNING: PDF not produced. {pdf_warning}")
+```
+
+**Soft-fail semantics:** Always deliver the `.docx`. Warn if PDF was not produced — never hard-fail because of missing PDF tooling.
+
 ### HTML rendering
+
+`weasyprint` is installed on demand by Step 0 when `template_format == "html"`.
 
 ```python
 from jinja2 import Template
@@ -133,12 +238,18 @@ context = {
 }
 rendered_html = template.render(context)
 
-# Build job folder and filename
+# Build job folder and filename — deduplicate if a same-named folder already exists
 key_var = context.get("<most_identifying_variable>", "document")
 slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+base_job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+job_name = base_job_name
 job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
+counter = 2
+while os.path.exists(job_dir):
+    job_name = f"{base_job_name}_{counter}"
+    job_dir = os.path.join(output_dir, job_name)
+    counter += 1
+os.makedirs(job_dir)
 
 # Save rendered HTML
 html_path = os.path.join(job_dir, f"{job_name}.html")
@@ -197,9 +308,12 @@ After rendering, scan the output to confirm all placeholders and control tags we
 ## Step 4 — Report Results
 
 Return to the orchestrator:
-- The path(s) to the rendered document(s) (docx, or html + pdf)
+- The path(s) to the rendered document(s):
+  - For docx: always include the `.docx` path; include the `.pdf` path if `pdf_produced` is `True`
+  - For HTML: include both the `.html` and `.pdf` paths
 - Whether validation passed or failed
 - If failed: the list of unfilled variable names and/or unprocessed control tags
+- For docx: whether PDF was produced. If not, include the `pdf_warning` text so the Orchestrator can relay it to the user.
 
 ---
 
@@ -207,6 +321,7 @@ Return to the orchestrator:
 
 - **Never modify template files** — only read them.
 - **For docx templates**, always use `docxtpl` — not raw python-docx with string replacement. `docxtpl` preserves formatting around placeholders and natively supports Jinja2 control tags.
+- **PDF output for docx templates** is produced on demand using `docx2pdf` (requires Microsoft Word or LibreOffice) or LibreOffice headless. If neither is available, only `.docx` is delivered with a warning.
 - **For HTML templates**, use `jinja2.Template` for rendering and `weasyprint` for PDF conversion.
 - **Boolean coercion is critical** — always ensure boolean gate variables are Python `True`/`False` before rendering. A string `"false"` is truthy in Jinja2 and will cause incorrect conditional evaluation.
 - **Use `uv`** for Python package management.
