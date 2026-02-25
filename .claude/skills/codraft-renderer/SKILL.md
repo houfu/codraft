@@ -135,12 +135,18 @@ context = {
 }
 doc.render(context)
 
-# Build job folder and filename
+# Build job folder and filename — deduplicate if a same-named folder already exists
 key_var = context.get("<most_identifying_variable>", "document")
 slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+base_job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+job_name = base_job_name
 job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
+counter = 2
+while os.path.exists(job_dir):
+    job_name = f"{base_job_name}_{counter}"
+    job_dir = os.path.join(output_dir, job_name)
+    counter += 1
+os.makedirs(job_dir)
 
 output_path = os.path.join(job_dir, f"{job_name}.docx")
 doc.save(output_path)
@@ -232,12 +238,18 @@ context = {
 }
 rendered_html = template.render(context)
 
-# Build job folder and filename
+# Build job folder and filename — deduplicate if a same-named folder already exists
 key_var = context.get("<most_identifying_variable>", "document")
 slug = key_var.lower().replace(" ", "_").replace(".", "")
-job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+base_job_name = f"<template_name>_{slug}_{date.today().isoformat()}"
+job_name = base_job_name
 job_dir = os.path.join(output_dir, job_name)
-os.makedirs(job_dir, exist_ok=True)
+counter = 2
+while os.path.exists(job_dir):
+    job_name = f"{base_job_name}_{counter}"
+    job_dir = os.path.join(output_dir, job_name)
+    counter += 1
+os.makedirs(job_dir)
 
 # Save rendered HTML
 html_path = os.path.join(job_dir, f"{job_name}.html")
