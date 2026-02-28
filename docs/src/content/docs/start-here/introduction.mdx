@@ -19,13 +19,13 @@ Traditional tools require you to:
 - Host and maintain a server
 - Train non-technical users on complex software
 
-Codraft's approach: write a template in Word or HTML, add `{{ variable_name }}` placeholders, and let Claude handle everything else.
+Codraft's approach: write a template in Word, HTML, or Markdown, add `{{ variable_name }}` placeholders, and let Claude handle everything else.
 
 ## How it works
 
 **1. You write a template**
 
-Add a `.docx` or `.html` file to `templates/`, using Jinja2-style placeholders wherever you need dynamic content:
+Add a `.docx`, `.html`, or `.md` file to `templates/`, using Jinja2-style placeholders wherever you need dynamic content:
 
 ```
 This Agreement is entered into between {{ client_name }} ("Client")
@@ -48,7 +48,7 @@ When was the meeting held?
 
 **3. You get a completed document**
 
-Once confirmed, the document is rendered and saved to `output/`. Docx templates produce Word documents and, when Microsoft Word or LibreOffice is available, a PDF too. HTML templates always produce both HTML and PDF.
+Once confirmed, the document is rendered and saved to `output/`. Docx templates produce Word documents and, when Microsoft Word or LibreOffice is available, a PDF too. HTML templates always produce both HTML and PDF. Markdown templates produce a `.md` file with an optional PDF. A transcript of the interview is saved alongside the output for reference.
 
 ## What you can build
 
