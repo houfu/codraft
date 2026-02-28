@@ -29,6 +29,7 @@ tests/results/
 build/
 plugin/skills/
 plugin/templates/
+plugin/scripts/
 
 # Claude Code internal
 .claude/worktrees/

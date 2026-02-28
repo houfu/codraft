@@ -15,38 +15,36 @@ All sections are optional. You only need to include the fields you want to custo
 
 ```yaml
 meta:
-  display_name: "Consulting Agreement"
-  description: "Standard consulting engagement agreement"
+  display_name: "Meeting Notes"
+  description: "Structured meeting notes with action items and optional sections"
 
 variables:
-  client_name:
-    label: "Client's Legal Name"
-    question: "What is the client's full legal name?"
-    default: ""
+  meeting_title:
+    label: "Meeting Title"
+    question: "What is the title of this meeting?"
     required: true
-    format_hint: "Full legal name as registered"
-  payment_method:
+  meeting_type:
     type: choice
-    choices: [bank_transfer, cheque, crypto]
-    default: "bank_transfer"
-  include_ip_assignment:
+    choices: [standup, workshop, review]
+    default: "standup"
+  include_next_meeting:
     type: boolean
-    question: "Does this engagement involve IP assignment?"
+    question: "Is a follow-up meeting scheduled?"
     default: false
 
 groups:
-  - name: "Parties"
-    variables: [client_name, client_address]
-  - name: "IP Assignment"
-    condition: include_ip_assignment
-    variables: [ip_ownership_entity, ip_assignment_date]
-  - name: "Milestones"
-    loop: milestones
-    variables: [description, date, amount]
+  - name: "Meeting Details"
+    variables: [meeting_title, meeting_date, meeting_type]
+  - name: "Next Meeting"
+    condition: include_next_meeting
+    variables: [next_meeting_date, next_meeting_topic]
+  - name: "Action Items"
+    loop: action_items
+    variables: [description, assignee, due_date]
 
 validation:
-  - rule: "end_date > effective_date"
-    message: "The end date must be after the effective date"
+  - rule: "next_meeting_date > meeting_date"
+    message: "The next meeting date must be after this meeting's date"
 ```
 
 ---
@@ -62,8 +60,8 @@ validation:
 
 ```yaml
 meta:
-  display_name: "Consulting Agreement"
-  description: "Standard consulting engagement agreement"
+  display_name: "Meeting Notes"
+  description: "Structured meeting notes with action items and optional sections"
 ```
 
 ---
@@ -106,25 +104,25 @@ If `type` is omitted, it is inferred from the variable name suffix (e.g., `*_dat
 
 ```yaml
 variables:
-  client_name:
-    label: "Client's Legal Name"
-    question: "What is the client's full legal name?"
+  meeting_title:
+    label: "Meeting Title"
+    question: "What is the title of this meeting?"
     required: true
-    format_hint: "Full legal name as registered"
 
-  effective_date:
-    type: date
+  meeting_date:
+    question: "When was the meeting held?"
     default: "today"
+    format_hint: "DD/MM/YYYY"
 
-  payment_method:
+  meeting_type:
     type: choice
-    choices: [bank_transfer, cheque, crypto]
-    default: bank_transfer
+    choices: [standup, workshop, review]
+    default: standup
 
-  include_ip_assignment:
+  include_next_meeting:
     type: boolean
     default: false
-    question: "Does this engagement involve IP assignment?"
+    question: "Is a follow-up meeting scheduled?"
 ```
 
 ---
@@ -142,17 +140,17 @@ Without groups, Claude presents variables one at a time in template order. With 
 | `name` | string | Yes | Display name for the group, shown as a heading during the interview. |
 | `variables` | list | Yes | List of variable names to collect in this group. |
 | `condition` | string | No | Name of a boolean variable. The group is only shown when that variable is `true`. The gate variable must be collected before this group. |
-| `loop` | string | No | Name of a loop collection. The group collects items for that `{% for %}` loop. Must match the collection name in the template (e.g., `milestones` for `{% for milestone in milestones %}`). |
+| `loop` | string | No | Name of a loop collection. The group collects items for that `{% for %}` loop. Must match the collection name in the template (e.g., `action_items` for `{% for item in action_items %}`). |
 
 ### Basic group
 
 ```yaml
 groups:
-  - name: "Parties"
-    variables: [client_name, client_address, consultant_name, consultant_address]
+  - name: "Meeting Details"
+    variables: [meeting_title, meeting_date, meeting_type, facilitator_name, meeting_location]
 
-  - name: "Engagement Terms"
-    variables: [effective_date, end_date, governing_law]
+  - name: "Attendees & Agenda"
+    variables: [attendees, agenda]
 ```
 
 ### Conditional group
@@ -161,9 +159,9 @@ A group gated on a boolean variable. Claude asks the gate question first; if the
 
 ```yaml
 groups:
-  - name: "IP Assignment"
-    condition: include_ip_assignment
-    variables: [ip_ownership_entity, ip_assignment_date]
+  - name: "Next Meeting"
+    condition: include_next_meeting
+    variables: [next_meeting_date, next_meeting_topic]
 ```
 
 ### Loop group
@@ -172,9 +170,9 @@ A group that maps to a `{% for %}` loop in the template. Claude collects items o
 
 ```yaml
 groups:
-  - name: "Milestones"
-    loop: milestones
-    variables: [description, date, amount]
+  - name: "Action Items"
+    loop: action_items
+    variables: [description, assignee, due_date]
 ```
 
 <Aside>
@@ -198,11 +196,8 @@ The `condition` and `loop` fields can be combined on the same group. In that cas
 
 ```yaml
 validation:
-  - rule: "end_date > effective_date"
-    message: "The end date must be after the effective date."
-
-  - rule: "service_fee > 0"
-    message: "The service fee must be a positive number."
+  - rule: "next_meeting_date > meeting_date"
+    message: "The next meeting date must be after this meeting's date."
 ```
 
 Rules have access to all collected variable values and use Python expression syntax.

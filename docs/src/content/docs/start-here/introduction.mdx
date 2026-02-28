@@ -34,21 +34,21 @@ and {{ consultant_name }} ("Consultant"), effective {{ effective_date }}.
 
 **2. Claude interviews you**
 
-Tell Claude: *"Prepare a consulting agreement"*. Claude finds your template, analyzes it for variables, conditional sections, and loops — then walks you through a natural conversation to collect all the values.
+Tell Claude: *"Prepare meeting notes"*. Claude finds your template, analyzes it for variables, conditional sections, and loops — then walks you through a natural conversation to collect all the values.
 
 ```
-Let's prepare the Consulting Agreement. I'll start with the parties.
+Let's prepare the Meeting Notes. I'll start with the meeting details.
 
-What is the client's full legal name?
-> Acme Pte Ltd
+What is the title of this meeting?
+> Q1 Sprint Retrospective
 
-What is the consultant's full legal name?
-> Jane Smith Consulting LLC
+When was the meeting held?
+> 28 February 2026
 ```
 
 **3. You get a completed document**
 
-Once confirmed, the document is rendered and saved to `output/`. Docx templates produce Word documents; HTML templates produce both HTML and PDF.
+Once confirmed, the document is rendered and saved to `output/`. Docx templates produce Word documents and, when Microsoft Word or LibreOffice is available, a PDF too. HTML templates always produce both HTML and PDF.
 
 ## What you can build
 

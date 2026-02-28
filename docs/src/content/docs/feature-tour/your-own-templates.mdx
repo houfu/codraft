@@ -11,54 +11,52 @@ Create a folder inside `templates/` with any name you like, and place your file 
 
 ```
 templates/
-  consulting_agreement/
-    consulting_agreement.docx
+  meeting_notes/
+    meeting_notes.md
 ```
 
-The folder name becomes the template identifier. When you tell Claude "prepare a consulting agreement," it matches the request to this folder automatically.
+The folder name becomes the template identifier. When you tell Claude "prepare meeting notes," it matches the request to this folder automatically.
 
 ## Add placeholders
 
 Open your document and replace the parts that change with `{{ variable_name }}` placeholders. Standard Jinja2 syntax -- nothing proprietary, nothing to learn from scratch:
 
 ```
-This Agreement is entered into on {{ effective_date }}
-by and between {{ client_name }} ("Client")
-and {{ consultant_name }} ("Consultant").
+# Meeting Notes — {{ meeting_title }}
 
-The Consultant will provide {{ service_description }}
-at a rate of {{ hourly_rate }} per hour.
+**Date:** {{ meeting_date }}
+**Facilitator:** {{ facilitator_name }}
+**Location:** {{ meeting_location }}
+**Type:** {{ meeting_type }}
 ```
 
 That is a working template. Codraft scans it, finds every placeholder, and builds an interview around them.
 
 ## Conditional sections
 
-Need a clause that only appears sometimes? Wrap it in an `{% if %}` block:
+Need a section that only appears sometimes? Wrap it in an `{% if %}` block:
 
 ```
-{% if include_non_compete %}
-The Consultant agrees not to engage in competing
-activities for {{ non_compete_period }} following
-termination of this agreement.
+{% if meeting_type == 'workshop' %}
+### Workshop Materials
+
+{{ workshop_materials }}
 {% endif %}
 ```
 
-Claude asks whether to include the section. If the user says no, the entire block is removed from the final document -- along with any follow-up questions about variables inside it.
+Claude evaluates the condition based on the user's earlier answers. If the meeting type is not "workshop," the entire block is removed from the final document -- along with any follow-up questions about variables inside it.
 
 ## Repeating sections
 
 Collect multiple items with a `{% for %}` loop:
 
 ```
-{% for milestone in milestones %}
-Milestone: {{ milestone.description }}
-Due date: {{ milestone.date }}
-Amount: {{ milestone.amount }}
+{% for item in action_items %}
+- **{{ item.description }}** — Assigned to: {{ item.assignee }}, Due: {{ item.due_date }}
 {% endfor %}
 ```
 
-Claude collects milestones one at a time and asks "Would you like to add another?" until the user is done.
+Claude collects action items one at a time and asks "Would you like to add another?" until the user is done.
 
 ## No special tools required
 

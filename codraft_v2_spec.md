@@ -46,7 +46,7 @@ The Orchestrator is the only user-facing skill. It invokes the Analyzer and Rend
 ### 2.2 Skill Interface Contracts
 
 **Analyzer**
-- **Input:** Template directory path (e.g., `templates/consulting_agreement/`)
+- **Input:** Template directory path (e.g., `templates/meeting_notes/`)
 - **Output:** `manifest.yaml` written to the template directory
 - **Behaviour:** Checks cache validity first. If `config.yaml` is present, merges overrides into the manifest.
 
@@ -71,129 +71,123 @@ The manifest is the single source of truth the Orchestrator reads. The Analyzer 
 ```yaml
 # ── Metadata ──────────────────────────────────────────────
 schema_version: 2
-template: "consulting_agreement.docx"
-template_path: "templates/consulting_agreement/consulting_agreement.docx"
-format: docx                    # "docx" or "html"
+template: "meeting_notes.md"
+template_path: "templates/meeting_notes/meeting_notes.md"
+format: md                      # "docx", "html", or "md"
 analyzed_at: "2026-02-16T10:30:00Z"
-variable_count: 12              # total unique variables (all scopes)
+variable_count: 14              # total unique variables (all scopes)
 
 # ── From config.yaml (optional, passthrough) ──────────────
 meta:                           # present only if config.yaml provides it
-  display_name: "Consulting Agreement"
-  description: "Standard consulting engagement agreement"
+  display_name: "Meeting Notes"
+  description: "Structured meeting notes with action items, optional sections, and meeting-type-specific content"
 
 # ── Unconditional variables ───────────────────────────────
 # Always collected during interview.
 variables:
-  - name: client_name
-    label: "Client Name"
+  - name: meeting_title
+    label: "Meeting Title"
     type: text
     # Optional fields (from config.yaml merge):
-    # question: "What is the client's full legal name?"
-    # description: "The legal entity or individual name"
-    # default: ""
+    # question: "What is the title of this meeting?"
     # required: true
-    # format_hint: "Full legal name as registered"
 
-  - name: payment_method
-    label: "Payment Method"
+  - name: meeting_type
+    label: "Meeting Type"
     type: choice               # new type in v2
     choices:                   # required when type is "choice"
-      - bank_transfer
-      - cheque
-      - crypto
-    # question: "How will the consultant be paid?"
-    # default: "bank_transfer"
+      - standup
+      - workshop
+      - review
+    # question: "What type of meeting was this?"
+    # default: "standup"
 
-  - name: effective_date
-    label: "Effective Date"
+  - name: meeting_date
+    label: "Meeting Date"
     type: date
 
 # ── Conditional blocks ────────────────────────────────────
 # Variables gated by {% if %} / {% else %} blocks.
 # Asked only if the condition evaluates to true/false.
 conditionals:
-  - condition: "include_ip_assignment"       # truthiness test
-    gate_type: boolean                       # "boolean" or "equality"
-    if_variables:
-      - name: ip_ownership_entity
-        label: "IP Ownership Entity"
-        type: text
-      - name: ip_assignment_date
-        label: "IP Assignment Date"
-        type: date
-    else_variables: []                       # populated if {% else %} block has variables
-
-  - condition: "payment_method == 'bank_transfer'"   # equality test
+  - condition: "meeting_type == 'workshop'"  # equality test
     gate_type: equality
-    gate_variable: payment_method            # which variable to check
-    gate_value: "bank_transfer"              # what value triggers the if-branch
+    gate_variable: meeting_type              # which variable to check
+    gate_value: "workshop"                   # what value triggers the if-branch
     if_variables:
-      - name: bank_name
-        label: "Bank Name"
-        type: text
-      - name: account_number
-        label: "Account Number"
+      - name: workshop_materials
+        label: "Workshop Materials"
         type: text
     else_variables: []
+
+  - condition: "include_next_meeting"        # truthiness test
+    gate_type: boolean                       # "boolean" or "equality"
+    if_variables:
+      - name: next_meeting_date
+        label: "Next Meeting Date"
+        type: date
+      - name: next_meeting_topic
+        label: "Next Meeting Topic"
+        type: text
+    else_variables: []                       # populated if {% else %} block has variables
 
 # ── Loop blocks ───────────────────────────────────────────
 # Variables inside {% for %} blocks. Collected as lists.
 loops:
-  - loop_var: "milestone"                    # iteration variable name
-    collection: "milestones"                 # collection variable name
-    label: "Project Milestone"               # human-readable label for the loop
+  - loop_var: "item"                         # iteration variable name
+    collection: "action_items"               # collection variable name
+    label: "Action Item"                     # human-readable label for the loop
     min_items: 1                             # minimum items required (default: 1)
     variables:                               # sub-variables per item
       - name: description
         label: "Description"
         type: text
-      - name: date
+      - name: assignee
+        label: "Assignee"
+        type: text
+      - name: due_date
         label: "Due Date"
         type: date
-      - name: amount
-        label: "Amount"
-        type: number
 
 # ── Dependencies (pre-computed) ───────────────────────────
 # Gate variable → list of dependent variable names.
 # Used by the Orchestrator to quickly determine which
 # questions to skip without re-parsing conditions.
 dependencies:
-  include_ip_assignment:
-    - ip_ownership_entity
-    - ip_assignment_date
-  payment_method:
-    - bank_name
-    - account_number
+  meeting_type:
+    - workshop_materials
+    - items_reviewed
+  include_next_meeting:
+    - next_meeting_date
+    - next_meeting_topic
 
 # ── Interview groups (optional) ───────────────────────────
 # If present (from config.yaml), the Orchestrator uses these
 # groups instead of auto-grouping. If absent, the Orchestrator
 # groups variables by logical affinity as in v1.
 groups:
-  - name: "Parties"
-    variables: [client_name, client_address, consultant_name, consultant_address]
+  - name: "Meeting Details"
+    variables: [meeting_title, meeting_date, meeting_type, facilitator_name, meeting_location]
 
-  - name: "Engagement Terms"
-    variables: [effective_date, scope_of_work, payment_method]
+  - name: "Attendees & Agenda"
+    variables: [attendees, agenda]
 
-  - name: "IP Assignment"
-    condition: include_ip_assignment         # conditional group
-    variables: [ip_ownership_entity, ip_assignment_date]
+  - name: "Workshop Materials"
+    condition: "meeting_type == 'workshop'"   # conditional group
+    variables: [workshop_materials]
 
-  - name: "Bank Details"
-    condition: "payment_method == 'bank_transfer'"
-    variables: [bank_name, account_number]
+  - name: "Action Items"
+    loop: action_items                        # loop group
+    variables: [description, assignee, due_date]
 
-  - name: "Milestones"
-    loop: milestones                         # loop group
-    variables: [description, date, amount]
+  - name: "Next Meeting"
+    condition: include_next_meeting           # conditional group
+    variables: [next_meeting_date, next_meeting_topic]
 
 # ── Validation rules (optional, from config.yaml) ────────
 validation:
-  - rule: "end_date > effective_date"
-    message: "The end date must be after the effective date"
+  - rule: "next_meeting_date > meeting_date"
+    message: "The next meeting date must be after this meeting's date"
 ```
 
 ### 3.2 Schema Notes
@@ -237,76 +231,71 @@ An optional YAML file placed alongside the template by the template developer. I
 ```yaml
 # ── Template metadata ─────────────────────────────────────
 meta:
-  display_name: "Consulting Agreement"       # shown to user during discovery
-  description: "Standard consulting engagement agreement with optional IP assignment"
-  category: "contracts"                      # reserved for v3 categorisation
+  display_name: "Meeting Notes"              # shown to user during discovery
+  description: "Structured meeting notes with action items, optional sections, and meeting-type-specific content"
+  category: "productivity"                   # reserved for v3 categorisation
 
 # ── Variable overrides ────────────────────────────────────
 # Keys are variable names from the template.
 # Any field here overrides the Analyzer's auto-inferred values.
 variables:
-  client_name:
-    label: "Client's Legal Name"
-    question: "What is the client's full legal name as it should appear in the agreement?"
-    description: "The legal entity or individual name of the client"
-    default: ""
+  meeting_title:
+    label: "Meeting Title"
+    question: "What is the title of this meeting?"
     required: true
-    format_hint: "Full legal name as registered"
 
-  effective_date:
-    question: "When should this agreement take effect?"
+  meeting_date:
+    question: "When was the meeting held?"
     default: "today"                         # resolves to current date at interview time
     format_hint: "DD/MM/YYYY"
 
-  payment_method:
+  meeting_type:
     type: choice
     choices:
-      - bank_transfer
-      - cheque
-      - crypto
-    question: "How will the consultant be paid?"
-    default: "bank_transfer"
+      - standup
+      - workshop
+      - review
+    question: "What type of meeting was this?"
+    default: "standup"
 
-  include_ip_assignment:
+  decisions_made:
     type: boolean
-    question: "Does this engagement involve intellectual property that should be assigned to the client?"
+    question: "Were any decisions made during this meeting?"
     default: false
 
-  hourly_rate:
-    type: number
-    validation:
-      min: 0
-      max: 10000
-    format_hint: "Amount in USD, no currency symbol"
+  include_next_meeting:
+    type: boolean
+    question: "Is a follow-up meeting scheduled?"
+    default: false
 
 # ── Interview groups ──────────────────────────────────────
 # Overrides the Orchestrator's auto-grouping.
 # Each group defines which variables are asked together.
 groups:
-  - name: "Parties"
-    variables: [client_name, client_address, consultant_name, consultant_address]
+  - name: "Meeting Details"
+    variables: [meeting_title, meeting_date, meeting_type, facilitator_name, meeting_location]
 
-  - name: "Engagement Terms"
-    variables: [effective_date, scope_of_work, payment_method]
+  - name: "Attendees & Agenda"
+    variables: [attendees, agenda]
 
-  - name: "IP Assignment"
-    condition: include_ip_assignment          # only asked if gate is true
-    variables: [ip_ownership_entity, ip_assignment_date]
+  - name: "Workshop Materials"
+    condition: "meeting_type == 'workshop'"    # only asked if meeting type is workshop
+    variables: [workshop_materials]
 
-  - name: "Bank Details"
-    condition: "payment_method == 'bank_transfer'"
-    variables: [bank_name, account_number]
+  - name: "Action Items"
+    loop: action_items                         # collected as a list
+    variables: [description, assignee, due_date]
 
-  - name: "Milestones"
-    loop: milestones                          # collected as a list
-    variables: [description, date, amount]
+  - name: "Next Meeting"
+    condition: include_next_meeting            # only asked if gate is true
+    variables: [next_meeting_date, next_meeting_topic]
 
 # ── Cross-field validation ────────────────────────────────
 # Evaluated during the Confirmation phase after all values are collected.
 # Rules are simple comparisons the Orchestrator can evaluate.
 validation:
-  - rule: "end_date > effective_date"
-    message: "The end date must be after the effective date"
+  - rule: "next_meeting_date > meeting_date"
+    message: "The next meeting date must be after this meeting's date"
 ```
 
 ### 4.3 Merge Rules
@@ -345,15 +334,16 @@ Scan the full text content and identify all block boundaries. Build a list of sc
 
 ```
 TEMPLATE_TEXT
-├── [top-level] ... {{ client_name }} ...
-├── [if include_ip_assignment]
-│   ├── [if-branch] ... {{ ip_ownership_entity }} ... {{ ip_assignment_date }} ...
-│   └── [else-branch] ... (empty or has variables) ...
-├── [top-level] ... {{ payment_method }} ...
-├── [if payment_method == 'bank_transfer']
-│   └── [if-branch] ... {{ bank_name }} ... {{ account_number }} ...
-└── [for milestone in milestones]
-    └── [loop-body] ... {{ milestone.description }} ... {{ milestone.date }} ...
+├── [top-level] ... {{ meeting_title }} ... {{ meeting_date }} ...
+├── [if meeting_type == 'workshop']
+│   └── [if-branch] ... {{ workshop_materials }} ...
+├── [if meeting_type == 'review']
+│   └── [if-branch] ... {{ items_reviewed }} ...
+├── [for item in action_items]
+│   └── [loop-body] ... {{ item.description }} ... {{ item.assignee }} ... {{ item.due_date }} ...
+└── [if include_next_meeting]
+    ├── [if-branch] ... {{ next_meeting_date }} ... {{ next_meeting_topic }} ...
+    └── [else-branch] ... (static text, no variables) ...
 ```
 
 **Pass 2 — Variable classification:**
@@ -375,12 +365,12 @@ If a variable appears both as a condition and as a `{{ }}` reference, keep its i
 
 ### 5.4 Loop Sub-Variable Extraction
 
-For `{% for milestone in milestones %}` containing `{{ milestone.description }}`:
+For `{% for item in action_items %}` containing `{{ item.description }}`:
 
-1. `milestones` is the **collection** variable (type: `list`, not directly asked)
-2. `milestone` is the **loop variable** (iteration alias)
-3. `milestone.description` → sub-variable `description` (strip the loop variable prefix)
-4. Apply standard type inference to the sub-variable name: `description` → `text`, `date` → `date`, `amount` → `number`
+1. `action_items` is the **collection** variable (type: `list`, not directly asked)
+2. `item` is the **loop variable** (iteration alias)
+3. `item.description` → sub-variable `description` (strip the loop variable prefix)
+4. Apply standard type inference to the sub-variable name: `description` → `text`, `assignee` → `text`, `due_date` → `date`
 
 ### 5.5 Condition Parsing
 
@@ -549,11 +539,8 @@ codraft/
 │   │   │   └── Readme.md
 │   │   ├── invoice/
 │   │   │   └── invoice.html
-│   │   ├── consulting_agreement/     # NEW — v2 example (docx)
-│   │   │   ├── consulting_agreement.docx
-│   │   │   └── config.yaml
-│   │   └── event_invitation/         # NEW — v2 example (html)
-│   │       ├── event_invitation.html
+│   │   └── meeting_notes/            # v2 example (md, conditionals + loops)
+│   │       ├── meeting_notes.md
 │   │       └── config.yaml
 │   └── <user_template>/
 │       ├── <name>.docx or <name>.html
@@ -568,90 +555,108 @@ codraft/
 ## 9. Example Session (v2 — Conditionals + Loops)
 
 ```
-User: I need to prepare a consulting agreement
+User: I need to prepare meeting notes
 
-Claude: I'll use the Consulting Agreement template. I've found 12 fields to
+Claude: I'll use the Meeting Notes template. I've found 14 fields to
         complete across several sections. Some sections are optional depending
         on your answers.
 
-        Let's start with the parties. What is the client's full legal name
-        and address?
+        Let's start with the meeting details. What is the title of the
+        meeting, and when was it held?
 
-User: TechCorp Pte Ltd, 1 Raffles Place #30-01 Singapore 048616
+User: Q1 Sprint Retrospective, 28 February 2026
 
-Claude: And the consultant's full name and address?
+Claude: What type of meeting was this?
+        Options: standup, workshop, or review
 
-User: Sarah Chen, 88 Telok Ayer Street #03-01 Singapore 048468
+User: Workshop
 
-Claude: Now the engagement terms. When should this agreement take effect,
-        and what is the scope of work?
+Claude: Who facilitated the meeting, and where was it held?
 
-User: 1 March 2026. The scope is full-stack web application development.
+User: Sarah Chen, Conference Room B
 
-Claude: How will the consultant be paid?
-        Options: bank transfer, cheque, or crypto
+Claude: Now the attendees and agenda. Who attended the meeting?
 
-User: Bank transfer
+User: Sarah Chen, James Tan, Priya Sharma, David Kim
 
-Claude: Since you chose bank transfer, I'll need the bank details.
-        What is the bank name and account number?
+Claude: What was the agenda?
 
-User: DBS Bank, 012-345678-9
+User: Review sprint outcomes, workshop on improving CI pipeline, assign follow-up tasks
 
-Claude: Does this engagement involve intellectual property that should be
-        assigned to the client?
+Claude: Since this was a workshop, what materials were used or distributed?
 
-User: Yes
+User: CI pipeline architecture diagrams, benchmark results spreadsheet
 
-Claude: What entity should own the IP, and from what date?
+Claude: Summarize the key discussion points.
 
-User: TechCorp Pte Ltd, from 1 March 2026
+User: Reviewed sprint velocity trends. Discussed bottlenecks in the CI pipeline. Workshopped solutions including parallel test execution and caching strategies.
 
-Claude: Now let's add the project milestones. I'll ask for each one.
-        What's the description, due date, and amount for the first milestone?
+Claude: Now let's add the action items. I'll ask for each one.
+        What's the description, assignee, and due date for the first item?
 
-User: Design phase, 15 March 2026, $5,000
+User: Implement parallel test execution, James Tan, 7 March 2026
 
-Claude: Got it — Milestone 1: Design phase, due 15 March 2026, $5,000.
-        Would you like to add another milestone?
+Claude: Got it — Action Item 1: Implement parallel test execution,
+        assigned to James Tan, due 7 March 2026.
+        Would you like to add another action item?
 
-User: Yes. Development phase, 30 April 2026, $10,000
+User: Yes. Set up build caching, Priya Sharma, 14 March 2026
 
-Claude: Milestone 2: Development phase, due 30 April 2026, $10,000.
-        Another?
+Claude: Action Item 2: Set up build caching, assigned to Priya Sharma,
+        due 14 March 2026. Another?
 
 User: No, that's all
 
+Claude: Were any decisions made during this meeting?
+
+User: Yes
+
+Claude: What decisions were made?
+
+User: Agreed to adopt parallel test execution as the default CI strategy starting next sprint.
+
+Claude: Is a follow-up meeting scheduled?
+
+User: Yes, 7 March 2026, CI pipeline progress review
+
+Claude: Who recorded these notes?
+
+User: David Kim
+
 Claude: Here's a summary of all the details:
 
-        Parties:
-        - Client: TechCorp Pte Ltd, 1 Raffles Place #30-01 Singapore 048616
-        - Consultant: Sarah Chen, 88 Telok Ayer Street #03-01 Singapore 048468
+        Meeting Details:
+        - Title: Q1 Sprint Retrospective
+        - Date: 28/02/2026
+        - Type: Workshop
+        - Facilitator: Sarah Chen
+        - Location: Conference Room B
 
-        Engagement Terms:
-        - Effective Date: 01/03/2026
-        - Scope: Full-stack web application development
-        - Payment Method: Bank transfer
+        Attendees: Sarah Chen, James Tan, Priya Sharma, David Kim
+        Agenda: Review sprint outcomes, workshop on improving CI pipeline,
+                assign follow-up tasks
 
-        Bank Details:
-        - Bank: DBS Bank
-        - Account: 012-345678-9
+        Workshop Materials: CI pipeline architecture diagrams, benchmark
+                           results spreadsheet
 
-        IP Assignment:
-        - Ownership Entity: TechCorp Pte Ltd
-        - Assignment Date: 01/03/2026
+        Action Items:
+        1. Implement parallel test execution — James Tan — 7 March 2026
+        2. Set up build caching — Priya Sharma — 14 March 2026
 
-        Milestones:
-        1. Design phase — 15 March 2026 — $5,000
-        2. Development phase — 30 April 2026 — $10,000
+        Decisions: Agreed to adopt parallel test execution as the default
+                   CI strategy starting next sprint.
+
+        Next Meeting: 7 March 2026 — CI pipeline progress review
+
+        Recorder: David Kim
 
         Shall I produce the document?
 
 User: Yes
 
-Claude: Done! Your consulting agreement has been saved as:
-        output/consulting_agreement_techcorp_pte_ltd_2026-02-16/
-        consulting_agreement_techcorp_pte_ltd_2026-02-16.docx
+Claude: Done! Your meeting notes have been saved as:
+        output/meeting_notes_q1_sprint_retrospective_2026-02-28/
+        meeting_notes_q1_sprint_retrospective_2026-02-28.md
 ```
 
 ---

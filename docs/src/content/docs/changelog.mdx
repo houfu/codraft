@@ -3,6 +3,14 @@ title: Changelog
 description: Version history for Codraft
 ---
 
+## v0.2.1 — Modular renderer, PDF output for docx (February 2026)
+
+**New features:**
+- PDF output for `.docx` templates — produced automatically when Microsoft Word (`docx2pdf`) or LibreOffice is available; soft-fails with a warning if neither is found
+- On-demand dependency installation — `docx2pdf` is installed only for docx jobs, `weasyprint` only for HTML jobs; no unnecessary packages loaded
+
+---
+
 ## v0.2 — Codraft v2 (February 2026)
 
 **New features:**
@@ -13,7 +21,7 @@ description: Version history for Codraft
 - Cross-field validation rules
 - Skill separation: Orchestrator, Analyzer, and Renderer skills
 - Manifest v2 schema with `schema_version: 2`, conditionals, loops, and dependencies
-- New example templates: Consulting Agreement (docx), Event Invitation (html)
+- Enhanced Meeting Notes example template (md) demonstrating all v2 features: choice variables, equality and boolean conditionals, loops, and config.yaml
 
 **v2 constraints:**
 - Single-level nesting only
