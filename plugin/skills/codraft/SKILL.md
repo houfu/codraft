@@ -33,6 +33,8 @@ If the manifest is missing, stale, or has `schema_version` < 2, run the **codraf
 
 Load the resulting manifest and proceed — it is the single source of truth for the interview.
 
+After the analyzer completes, append a `tool_use` entry to the interview log recording the invocation.
+
 ### Understanding the Manifest
 
 The v2 manifest contains: `variables` (unconditional), `conditionals` (each with `condition`, `gate_type`, `gate_variable`/`gate_value`, `if_variables`/`else_variables`), `loops` (each with `collection`, `loop_var`, `label`, `min_items`, `variables`), `dependencies` (gate variable -> dependent variable map), and optional `groups`, `validation`, `meta` sections.
@@ -82,17 +84,29 @@ Initialize the log with one entry:
   request: <session_request captured in Phase 1 — user's verbatim opening message>
   template: <manifest meta.display_name, or title-cased template dir name>
   started_at: <current date/time, ISO 8601>
+  timestamp: <same as started_at>
+
+**Every entry type below must include a `timestamp` field** (ISO 8601 datetime, e.g.
+`2026-03-01T12:03:00+08:00`). For `question` entries, timestamp is when Claude sent the
+question; for `answer` entries, when the user's response was received.
 
 Entry types appended during Phases 4 and 5:
   prefill           — variables extracted from opening message (list of {name, label, value})
   group_start       — begins a named group (branch: "if"/"else"/"skipped" for conditionals)
-  question          — effective question(s) asked in one turn
+  question          — effective question(s) asked in one turn; include `questions` (array of variable names asked about)
   clarification     — substantive user question + Claude's response (user_question, claude_response)
   answer            — effective final answer, near-verbatim
   validation_retry  — re-ask after failed validation (reason)
   skip              — variable/group skipped, with human-readable reason
   loop_item         — confirmed loop item (item_index, question, answer, values dict)
   correction        — Phase 5 edit (field, label, old_value, new_value, optional note)
+
+Entry type appended when a skill or script is invoked:
+  tool_use          — records a skill/script invocation:
+                        tool: skill or script name (e.g. "codraft-analyzer", "codraft-renderer", "codraft-transcriber")
+                        action: brief description (e.g. "Parsed template and generated manifest")
+                        timestamp: when invoked (ISO 8601)
+                        completed_at: when finished (ISO 8601)
 
 This log is scoped to ONE document assembly. Reset it at the start of Phase 3d whenever
 you begin preparing a new document.
@@ -180,6 +194,8 @@ The renderer will:
 2. Validate the output for any unfilled `{{ }}` placeholders or unrendered `{% %}` control tags
 3. Return the output path(s) and validation status
 
+After the renderer completes, append a `tool_use` entry to the interview log recording the invocation.
+
 If validation **fails** (unfilled placeholders or unrendered tags found):
 - Report the issue to the user
 - Offer to re-collect the missing values and re-render
@@ -191,7 +207,7 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
 
 ### Step 7a — Serialize Interview Log and Generate Transcript
 
-**Step 7a-i:** Serialize the interview log to `interview_log.json` in the job folder as `{"schema_version": 1, "entries": [...]}` using `json.dump` with `ensure_ascii=False, indent=2`. Entry shapes are defined in Phase 3d.
+**Step 7a-i:** Serialize the interview log to `interview_log.json` in the job folder as `{"schema_version": 2, "entries": [...]}` using `json.dump` with `ensure_ascii=False, indent=2`. Entry shapes are defined in Phase 3d.
 
 **Step 7a-ii:** Run the **codraft-transcriber** skill with:
   - The interview log path: `<job_folder>/interview_log.json`
@@ -201,6 +217,8 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
   - The end date/time (current time, ISO 8601)
 
 The transcriber will write `transcript.md` to the job folder and confirm success.
+
+After the transcriber completes, append a `tool_use` entry to the interview log recording the invocation. (This entry is captured for completeness; it won't appear in this session's transcript since the transcriber has already run.)
 
 ---
 

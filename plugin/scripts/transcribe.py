@@ -24,6 +24,25 @@ import yaml
 
 
 # ---------------------------------------------------------------------------
+# Timestamp formatting
+# ---------------------------------------------------------------------------
+
+
+def format_time(iso_str: str | None) -> str | None:
+    """Extract a human-readable time-of-day from an ISO 8601 timestamp.
+
+    Returns e.g. '12:03 PM', or None if the input is missing/unparseable.
+    """
+    if not iso_str:
+        return None
+    try:
+        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        return dt.strftime("%-I:%M %p")
+    except (ValueError, AttributeError):
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Value formatting
 # ---------------------------------------------------------------------------
 
@@ -71,7 +90,22 @@ def has_conditionals(manifest: dict) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def build_header(session_start: dict, ended_at: str, output_files: str) -> str:
+def derive_ended_at(entries: list, cli_ended_at: str) -> str:
+    """Derive the session end time from the last entry's timestamp or completed_at.
+
+    Walks entries in reverse to find the most recent timestamp. Falls back to the
+    CLI-provided ended_at value.
+    """
+    for entry in reversed(entries):
+        ts = entry.get("completed_at") or entry.get("timestamp")
+        if ts:
+            return ts
+    return cli_ended_at
+
+
+def build_header(
+    session_start: dict, ended_at: str, output_files: str
+) -> str:
     """Build Section 1 -- Header."""
     lines = [
         "# Document Assembly Transcript",
@@ -124,7 +158,9 @@ def build_interview(entries: list, manifest: dict) -> str:
             lines.append("")
 
         elif entry_type == "question":
-            lines.append(f"**Q:** {entry.get('text', '')}")
+            ts = format_time(entry.get("timestamp"))
+            prefix = f"**Q** *({ts}):*" if ts else "**Q:**"
+            lines.append(f"{prefix} {entry.get('text', '')}")
             lines.append("")
 
         elif entry_type == "clarification":
@@ -138,7 +174,23 @@ def build_interview(entries: list, manifest: dict) -> str:
             lines.append("")
 
         elif entry_type == "answer":
-            lines.append(f"**A:** {format_value(entry.get('text', entry.get('value', '')))}")
+            ts = format_time(entry.get("timestamp"))
+            prefix = f"**A** *({ts}):*" if ts else "**A:**"
+            lines.append(f"{prefix} {format_value(entry.get('text', entry.get('value', '')))}")
+            lines.append("")
+
+        elif entry_type == "tool_use":
+            tool = entry.get("tool", "")
+            action = entry.get("action", "")
+            ts_start = format_time(entry.get("timestamp"))
+            ts_end = format_time(entry.get("completed_at"))
+            if ts_start and ts_end:
+                time_range = f" ({ts_start} \u2192 {ts_end})"
+            elif ts_start:
+                time_range = f" ({ts_start})"
+            else:
+                time_range = ""
+            lines.append(f"> *Tool: {tool} \u2014 {action}{time_range}*")
             lines.append("")
 
         elif entry_type == "skip":
@@ -370,11 +422,14 @@ def main(argv: list[str] | None = None) -> None:
             session_start = entries[0]
             remaining_entries = entries[1:]
 
+        # Derive ended_at from log entries, falling back to CLI arg
+        ended_at = derive_ended_at(entries, args.ended_at)
+
         # Build all four sections
-        header = build_header(session_start, args.ended_at, args.output_files)
+        header = build_header(session_start, ended_at, args.output_files)
         interview = build_interview(remaining_entries, manifest)
         confirmed = build_confirmed_values(remaining_entries, manifest)
-        footer = build_footer(args.ended_at)
+        footer = build_footer(ended_at)
 
         transcript_content = "\n\n".join([header, interview, confirmed, footer]) + "\n"
 
