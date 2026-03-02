@@ -13,12 +13,10 @@ Install Codraft in Claude Code:
 
 ## Quick Start
 
-Once installed, ask Claude to prepare a document using one of the built-in example templates:
+Once installed, ask Claude to prepare a document with Codraft using one of the built-in example templates:
 
-- "Prepare an NDA"
-- "Prepare a consulting agreement"
-- "Prepare an event invitation"
-- "Prepare an invoice"
+- "Prepare an NDA with Codraft"
+- "Prepare an invoice with Codraft"
 
 Claude will walk you through an interview, asking for the information needed to complete the document, then render the final output.
 

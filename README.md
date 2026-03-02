@@ -1,7 +1,7 @@
 ![Codraft Logo](./docs/public/images/logo.png)
 # Codraft
 
-Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
+Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document with Codraft. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
 
 ## How It Works
 
@@ -10,7 +10,7 @@ Codraft is a document assembly tool for people already working with Claude and A
 3. Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers
 4. Use `{% for item in items %}` blocks for repeating sections (e.g., line items, milestones)
 5. Optionally add a `config.yaml` to customize questions, grouping, and validation
-6. Ask Claude to "prepare a [document type]"
+6. Ask Claude to "prepare a [document type] with Codraft"
 7. Claude walks you through a conversational interview -- skipping irrelevant sections and collecting lists naturally
 8. A completed document is rendered and saved to a job folder in `output/`
 
@@ -39,7 +39,7 @@ From within Claude Code:
 
 1. Add the marketplace: `/plugin marketplace add houfu/codraft`
 2. Install the plugin: `/plugin install codraft@codraft`
-3. Say "prepare an NDA" to try it out with a built-in template
+3. Say "prepare an NDA with Codraft" to try it out with a built-in template
 
 ## Quick Start
 
@@ -65,7 +65,7 @@ templates/
 
 Tell Claude:
 
-> "I need to prepare an NDA"
+> "I need to prepare an NDA with Codraft"
 
 Claude will find the template, extract its variables, and interview you for the values -- grouping related fields together for a natural flow.
 
