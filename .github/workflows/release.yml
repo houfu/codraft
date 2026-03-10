@@ -13,12 +13,21 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get version from tag
+      - name: Parse version and codename from tag
         id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          TAG="${GITHUB_REF#refs/tags/v}"
+          VERSION="${TAG%%-*}"
+          CODENAME="${TAG#*-}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "codename=$CODENAME" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
 
       - name: Set version env
-        run: echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
+        run: |
+          echo "VERSION=${{ steps.version.outputs.version }}" >> $GITHUB_ENV
+          echo "CODENAME=${{ steps.version.outputs.codename }}" >> $GITHUB_ENV
+          echo "TAG=${{ steps.version.outputs.tag }}" >> $GITHUB_ENV
 
       - name: Sync plugin directory
         run: bash scripts/build-plugin.sh "${VERSION}"
@@ -28,12 +37,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add plugin/
-          git diff --cached --quiet || git commit -m "chore: update plugin for release v${VERSION}"
+          git diff --cached --quiet || git commit -m "chore: update plugin for release v${TAG}"
           git push origin HEAD:main
 
       - name: Build Cowork ZIP
         run: |
-          ZIP_NAME="codraft-v${VERSION}.zip"
+          ZIP_NAME="codraft-v${TAG}.zip"
           while IFS= read -r line || [[ -n "$line" ]]; do
             [ -z "$line" ] && continue
             [ "${line:0:1}" = "#" ] && continue
@@ -43,19 +52,20 @@ jobs:
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
       - name: Package plugin ZIP
-        run: zip -r "codraft-plugin-v${VERSION}.zip" plugin/
+        run: zip -r "codraft-plugin-v${TAG}.zip" plugin/
 
       - name: Create latest-named aliases
         run: |
-          cp "codraft-v${VERSION}.zip" codraft-latest.zip
-          cp "codraft-plugin-v${VERSION}.zip" codraft-plugin-latest.zip
+          cp "codraft-v${TAG}.zip" codraft-latest.zip
+          cp "codraft-plugin-v${TAG}.zip" codraft-plugin-latest.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: "Codraft v${{ env.VERSION }} ${{ env.CODENAME }}"
           files: |
             ${{ env.ZIP_NAME }}
-            codraft-plugin-v${{ env.VERSION }}.zip
+            codraft-plugin-v${{ env.TAG }}.zip
             codraft-latest.zip
             codraft-plugin-latest.zip
           generate_release_notes: true

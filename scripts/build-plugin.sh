@@ -2,7 +2,7 @@
 # Sync skills and templates into plugin/ so it is a complete, installable package.
 # Usage:
 #   ./scripts/build-plugin.sh           # local dev — no version injection
-#   ./scripts/build-plugin.sh 1.2.3     # CI — injects version into plugin.json
+#   ./scripts/build-plugin.sh 3         # CI — injects version into plugin.json
 set -euo pipefail
 
 VERSION="${1:-}"
