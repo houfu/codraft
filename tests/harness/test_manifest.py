@@ -13,8 +13,8 @@ import yaml
 
 TESTS_DIR = Path(__file__).parent.parent
 FIXTURES_DIR = TESTS_DIR / "fixtures" / "templates"
-HARNESS_DIR = Path(__file__).parent
-ANALYZE_PY = HARNESS_DIR / "analyze.py"
+REPO_ROOT = TESTS_DIR.parent
+ANALYZE_PY = REPO_ROOT / "scripts" / "analyze.py"
 
 
 def run_analyzer(template_dir: Path) -> None:

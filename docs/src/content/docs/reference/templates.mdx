@@ -16,11 +16,8 @@ Each template lives in its own directory under `templates/`. The directory name 
       - Bonterms-Mutual-NDA.docx
     - invoice/
       - invoice.html
-    - consulting_agreement/
-      - consulting_agreement.docx
-      - config.yaml
-    - event_invitation/
-      - event-invitation.html
+    - meeting_notes/
+      - meeting_notes.md
       - config.yaml
   - my_template/
     - my_template.docx
@@ -31,7 +28,7 @@ Each template lives in its own directory under `templates/`. The directory name 
 ## Naming rules
 
 - The directory name is the template identifier used for matching user intent
-- Each directory contains exactly **one** template file: either `.docx` or `.html` — not both
+- Each directory contains exactly **one** template file: `.docx`, `.html`, or `.md` — not mixed
 - Variable names in the template must be valid Python identifiers: lowercase letters, numbers, and underscores
 
 ## Supported formats
@@ -40,8 +37,9 @@ Each template lives in its own directory under `templates/`. The directory name 
 |--------|--------|--------|
 | `.docx` | `docxtpl` | `.docx` + `.pdf` (when `docx2pdf` or LibreOffice available) |
 | `.html` | `jinja2` | `.html` + `.pdf` (via `weasyprint`) |
+| `.md` | `jinja2` | `.md` + optional `.pdf` (via `markdown` + `weasyprint`) |
 
-Both formats use the same Jinja2-style syntax for placeholders, conditionals, and loops.
+All formats use the same Jinja2-style syntax for placeholders, conditionals, and loops.
 
 ## Variable syntax
 
@@ -134,8 +132,7 @@ The `templates/_examples/` directory contains example templates that ship with C
 |---------|--------|----------|
 | `Bonterms_Mutual_NDA` | `.docx` | Simple variable substitution |
 | `invoice` | `.html` | HTML template with CSS styling |
-| `consulting_agreement` | `.docx` | Conditionals, loops, and `config.yaml` |
-| `event_invitation` | `.html` | Conditionals, loops, and `config.yaml` |
+| `meeting_notes` | `.md` | Choice variables, equality and boolean conditionals, loops, and `config.yaml` |
 
 These are read-only references. To experiment, copy an example to a new directory under `templates/`.
 
@@ -143,6 +140,6 @@ These are read-only references. To experiment, copy an example to a new director
 
 Your own templates go in `templates/<name>/` and are gitignored by default. Each template directory should contain:
 
-1. One template file (`.docx` or `.html`)
+1. One template file (`.docx`, `.html`, or `.md`)
 2. An optional `config.yaml` for interview customization
 3. A `manifest.yaml` that will be auto-generated on first analysis

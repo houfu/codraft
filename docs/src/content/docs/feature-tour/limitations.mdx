@@ -15,6 +15,31 @@ This means no two interviews are identical. Run the same template twice and you 
 
 If your use case requires a precise, repeatable interview with guaranteed question order and exact wording — a compliance checklist, an onboarding script, a regulated intake form — Codraft is not the right fit. A deterministic form tool will serve you better.
 
+**What you can control.** The more guidance a `config.yaml` provides, the less Claude has to improvise — and the more consistent the interview feels across runs, even though Claude may still rephrase or reorder within a group.
+
+**What stays deterministic.** The Analyzer extracts variables from the template by regex, not inference, so two runs always collect the same set of variables. And every session produces an `interview_log.json` and `transcript.md` in the job folder, so you can audit exactly which questions were asked and in what order.
+
+## Model choice affects quality
+
+Claude conducts the interview, so the model you select — Haiku, Sonnet, Opus — affects the experience. The difference is gradual, not binary: a lighter model still follows the interview structure, but a stronger one handles nuance better.
+
+**What improves with a stronger model:**
+
+- **Freeform answers.** If you say "TechCorp, next Friday, big conference room", a stronger model reliably extracts three separate values in one pass. A lighter model may ask you to clarify each one individually.
+- **Conditional sections.** Templates with `{% if %}` blocks require the model to track which sections apply and skip irrelevant questions. A stronger model is more reliable at re-evaluating these when you change an earlier answer.
+- **Loops.** Collecting a list of items ("add three action items with descriptions and due dates") requires keeping track of what has been entered and what remains. A lighter model may need more back-and-forth.
+- **Tool use.** Codraft uses tools to run the template analyzer, invoke the renderer, and — when available — present interview questions through structured prompts. A lighter model may fall back to plain text questions instead, which still works but offers less structure.
+
+**What stays the same regardless of model:** once values are collected, the actual document rendering is handled by Python. Template substitution, formatting preservation, and PDF generation work identically on every model.
+
+**Safety nets.** If a value is missed during the interview, two checks catch it before you receive a document. First, the confirmation step presents all collected values in a table for you to review — you can spot gaps and ask for corrections. Second, the renderer scans the finished document for any unfilled placeholders and refuses to deliver it if any remain, offering to re-collect instead. These checks are deterministic and work the same way on every model.
+
+**If you plan to use a lighter model,** a few things help:
+
+- **Review the confirmation table carefully.** It is your primary checkpoint. A lighter model may occasionally miss a variable or misinterpret an answer — the table makes this visible.
+- **Add a `config.yaml` to your template.** Explicit question text, groupings, and choice lists reduce what the model needs to infer on its own. The more guidance you give in the config, the less the model's reasoning ability matters.
+- **Keep templates simpler.** A handful of text placeholders works well on any model. Conditional sections, loops, and cross-field validation rules are where a stronger model earns its keep.
+
 ## The output is shaped by the conversation, not just the template
 
 Because the interview is a conversation, users can push back, suggest changes, and ask Claude to adapt the document. Claude will consider those requests. That flexibility is a feature for most uses, but it means the rendered document reflects the entire conversation — not only what the template author intended.
@@ -23,7 +48,11 @@ Consider this scenario: a landlord uses Codraft to prepare a standard tenancy ag
 
 This is a form of **prompt injection**. In a deterministic form, user input is data — it fills fields, nothing more. In a Claude conversation, user input is part of the prompt. A user who knows this can craft their answers to influence the document well beyond what the template author intended — removing clauses, softening terms, or inserting language that was never in the template.
 
-Codraft can be used for official documents and contracts, but it should never be the only step in the process. Anyone relying on such a document — to sign a lease, execute a contract, or submit a filing — must review the output before doing so. Codraft is a drafting aid, not a certified document generator.
+**Treat Codraft as a drafting aid, not a certified generator.** It can be used for official documents and contracts, but it should never be the only step in the process. Anyone relying on such a document — to sign a lease, execute a contract, or submit a filing — must review the output before doing so.
+
+**The confirmation table helps.** If a user talked Claude into changing a value, it will show up in the pre-render summary. A reviewer can compare the table against the template's intended variables and spot unexpected answers.
+
+**The transcript creates an audit trail.** The `transcript.md` in each job folder records every question, answer, and correction. If a document is disputed, it shows exactly how each value was arrived at — including any point where the user steered the conversation away from the template author's intent.
 
 ## Hallucination is largely prevented by design
 
@@ -33,9 +62,11 @@ Codraft's pipeline is structured to reduce the risk of Claude inventing document
 - **The Orchestrator collects a value for each variable** from the user during the interview.
 - **The Renderer does deterministic substitution** — it replaces placeholders with what was collected, nothing more.
 
-This means hallucination is largely contained, but not impossible. During the interview, Claude may suggest a value — offer to fill in a detail, complete a partial answer, or propose a sensible default — and the user may accept it without scrutinising it closely. That suggestion could be wrong: a plausible-sounding jurisdiction, a fee structure that doesn't quite match what was discussed, a date in the wrong year. It will pass through the confirmation step and appear in the rendered document, because the confirmation reflects what Claude collected, not what you originally said.
+This means hallucination is largely contained, but not impossible. During the interview, Claude may suggest a value — offer to fill in a detail, complete a partial answer, or propose a sensible default — and the user may accept it without scrutinising it closely. That suggestion could be wrong: a plausible-sounding jurisdiction, a fee structure that doesn't quite match what was discussed, a date in the wrong year.
 
-Read the rendered document in full before treating it as final, particularly any value that Claude suggested rather than you typed.
+**The confirmation table makes suggestions visible.** Values Claude suggested appear alongside ones you typed. If anything in the pre-render summary looks unfamiliar, it may be one Claude filled in on your behalf.
+
+**Read the rendered document in full,** particularly any value that Claude suggested rather than you typed. The confirmation table catches the values individually; reading the final document catches how they read in context.
 
 ## Claude is not a lawyer
 
@@ -43,7 +74,11 @@ Codraft can produce documents that look professionally drafted and legally compl
 
 A template might be out of date. A clause might be unenforceable in your jurisdiction. A standard term might interact with local law in a way neither you nor Claude anticipated. Claude will not flag any of this — it will fill the template and produce a document that reads well, even if the legal effect is not what you intended.
 
-For documents with real legal consequences — contracts, leases, employment agreements, IP assignments — have them reviewed by a qualified legal professional before you rely on them.
+**For documents with real legal consequences** — contracts, leases, employment agreements, IP assignments — have them reviewed by a qualified legal professional before you rely on them.
+
+**Share the transcript, not just the document.** When sending a draft for legal review, include the `transcript.md` from the job folder. It shows the reviewer what questions were asked, what the user answered, and where Claude filled in details — context a standalone document cannot provide.
+
+**Keep templates current.** Codraft faithfully renders whatever the template contains, outdated clauses included. If the law changes, update the template. A well-maintained template with a `config.yaml` — including validation rules and explicit choice lists for jurisdiction-sensitive fields — reduces the chance that an assembly session produces something legally stale.
 
 ## Template constraints (v2)
 
@@ -55,7 +90,7 @@ These are the current technical limits of the template engine:
 - **No Jinja2 expressions** — filters, math, and string manipulation are not supported. Variables are substituted as-is.
 
 <Aside type="tip" title="Looking ahead">
-The template constraints are v2 limits. Nested blocks, `elif` support, and computed fields are on the roadmap. Check the [Roadmap](/reference/roadmap/) for what is planned.
+These are current limits. Nested blocks, `elif` support, and computed fields may be added in a future release.
 </Aside>
 
 ## Requires a compatible client
@@ -73,7 +108,7 @@ It will not work in the Claude web interface, the Claude mobile app, or the API 
 The limitations above are trade-offs, not oversights. Traditional tools solve several of these problems:
 
 - **Deterministic interviews** -- a form tool guarantees question order, exact wording, and repeatable output. If that is a requirement, a form tool is the right choice.
-- **Shared document workflows** -- Docassemble supports authenticated access, branching workflows, and a centralised document store shared across users. Codraft has no shared data layer — each user runs their own instance locally. This is not a barrier to enterprise deployment (organisations already running Claude at scale can roll Codraft out as a plugin in minutes), but it does mean there is no centralised audit log or document repository out of the box.
+- **Shared document workflows** -- Docassemble supports authenticated access, branching workflows, and a centralised document store shared across users. Codraft has no shared data layer — each user runs their own instance locally. This is not a barrier to enterprise deployment (organisations already running Claude at scale can roll Codraft out as a plugin in minutes), but it does mean there is no centralised document repository out of the box. The `interview_log.json` and `transcript.md` produced in each job folder give you a per-document audit trail you can archive or feed into your own systems.
 - **No Claude dependency** -- if your organisation cannot use Claude, every alternative in this space works without it.
 
 See [How Codraft Compares](/codraft/feature-tour/how-it-compares/) for a full breakdown.

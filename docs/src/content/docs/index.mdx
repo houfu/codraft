@@ -4,6 +4,160 @@ description: Document assembly tool for Claude Cowork
 template: splash
 hero:
   tagline: Document assembly through conversation — for people already working with Claude and AI
+  image:
+    html: |
+      <svg viewBox="0 0 280 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animated sequence: a user requests a mutual NDA, and placeholders in the document template fill in one by one through conversation">
+        <style>
+          @keyframes doc-show {
+            0%, 11% { opacity: 0; }
+            15%, 84% { opacity: 1; }
+            88%, 100% { opacity: 0; }
+          }
+          @keyframes msg-prepare {
+            0% { opacity: 0; }
+            2%, 9% { opacity: 1; }
+            13%, 100% { opacity: 0; }
+          }
+          @keyframes msg-acme {
+            0%, 16% { opacity: 0; }
+            18%, 28% { opacity: 1; }
+            31%, 100% { opacity: 0; }
+          }
+          @keyframes msg-date {
+            0%, 35% { opacity: 0; }
+            37%, 47% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+          @keyframes msg-cali {
+            0%, 54% { opacity: 0; }
+            56%, 66% { opacity: 1; }
+            69%, 100% { opacity: 0; }
+          }
+          @keyframes msg-awesome {
+            0%, 73% { opacity: 0; }
+            75%, 83% { opacity: 1; }
+            86%, 100% { opacity: 0; }
+          }
+          @keyframes hl-client {
+            0%, 23% { opacity: 0.12; }
+            24.5% { opacity: 0.30; }
+            26%, 100% { opacity: 0.05; }
+          }
+          @keyframes hl-date {
+            0%, 43% { opacity: 0.12; }
+            44.5% { opacity: 0.30; }
+            46%, 100% { opacity: 0.05; }
+          }
+          @keyframes hl-law {
+            0%, 61% { opacity: 0.12; }
+            62.5% { opacity: 0.30; }
+            64%, 100% { opacity: 0.05; }
+          }
+          @keyframes ph-client {
+            0%, 24% { opacity: 1; }
+            26%, 100% { opacity: 0; }
+          }
+          @keyframes val-client {
+            0%, 24% { opacity: 0; }
+            26%, 100% { opacity: 1; }
+          }
+          @keyframes ph-date {
+            0%, 44% { opacity: 1; }
+            46%, 100% { opacity: 0; }
+          }
+          @keyframes val-date {
+            0%, 44% { opacity: 0; }
+            46%, 100% { opacity: 1; }
+          }
+          @keyframes ph-law {
+            0%, 62% { opacity: 1; }
+            64%, 100% { opacity: 0; }
+          }
+          @keyframes val-law {
+            0%, 62% { opacity: 0; }
+            64%, 100% { opacity: 1; }
+          }
+          @keyframes blink {
+            0%, 49.9% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+          }
+          .doc-show { opacity: 0; animation: doc-show 40s infinite; }
+          .input-show { opacity: 1; }
+          .msg-prepare { opacity: 0; animation: msg-prepare 40s infinite; }
+          .msg-acme { opacity: 0; animation: msg-acme 40s infinite; }
+          .msg-date { opacity: 0; animation: msg-date 40s infinite; }
+          .msg-cali { opacity: 0; animation: msg-cali 40s infinite; }
+          .msg-awesome { opacity: 0; animation: msg-awesome 40s infinite; }
+          .hl-client { opacity: 0.12; animation: hl-client 40s infinite; }
+          .hl-date { opacity: 0.12; animation: hl-date 40s infinite; }
+          .hl-law { opacity: 0.12; animation: hl-law 40s infinite; }
+          .ph-client { animation: ph-client 40s infinite; }
+          .val-client { opacity: 0; animation: val-client 40s infinite; }
+          .ph-date { animation: ph-date 40s infinite; }
+          .val-date { opacity: 0; animation: val-date 40s infinite; }
+          .ph-law { animation: ph-law 40s infinite; }
+          .val-law { opacity: 0; animation: val-law 40s infinite; }
+          .blink { animation: blink 1s step-end infinite; }
+        </style>
+        <defs>
+          <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d97758"/>
+            <stop offset="100%" stop-color="#c4613f"/>
+          </linearGradient>
+        </defs>
+        <g class="doc-show">
+          <rect x="24" y="22" width="240" height="340" rx="6" fill="rgba(0,0,0,0.06)"/>
+          <rect x="20" y="16" width="240" height="340" rx="6" fill="#fff" stroke="#e0ddd8" stroke-width="1"/>
+          <path d="M222 16h38v38z" fill="#f5f2ed"/>
+          <path d="M222 16v30a8 8 0 008 8h30" fill="none" stroke="#e0ddd8" stroke-width="1"/>
+          <rect x="42" y="40" width="120" height="8" rx="4" fill="#2a2a28"/>
+          <rect x="42" y="56" width="76" height="4" rx="2" fill="#c4c3bf"/>
+          <line x1="42" y1="76" x2="238" y2="76" stroke="#eae8e4" stroke-width="1"/>
+          <rect x="42" y="94" width="152" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="106" width="108" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="126" width="44" height="4" rx="2" fill="#d4d3cf"/>
+          <rect class="hl-client" x="90" y="118" width="120" height="20" rx="5" fill="url(#hg)"/>
+          <text class="ph-client" x="96" y="132" font-family="ui-monospace,SFMono-Regular,monospace" font-size="11" fill="#d97758">{{ client_name }}</text>
+          <text class="val-client" x="96" y="132" font-family="system-ui,sans-serif" font-size="11.5" fill="#1a2332" font-weight="600">Acme Corp</text>
+          <rect x="42" y="150" width="170" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="162" width="130" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="182" width="36" height="4" rx="2" fill="#d4d3cf"/>
+          <rect class="hl-date" x="82" y="174" width="138" height="20" rx="5" fill="url(#hg)"/>
+          <text class="ph-date" x="88" y="188" font-family="ui-monospace,SFMono-Regular,monospace" font-size="11" fill="#d97758">{{ effective_date }}</text>
+          <text class="val-date" x="88" y="188" font-family="system-ui,sans-serif" font-size="11.5" fill="#1a2332" font-weight="600">1 March 2026</text>
+          <rect x="42" y="206" width="156" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="218" width="92" height="4" rx="2" fill="#d4d3cf"/>
+          <line x1="42" y1="238" x2="238" y2="238" stroke="#eae8e4" stroke-width="1"/>
+          <rect x="42" y="256" width="118" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="276" width="52" height="4" rx="2" fill="#d4d3cf"/>
+          <rect class="hl-law" x="98" y="268" width="132" height="20" rx="5" fill="url(#hg)"/>
+          <text class="ph-law" x="104" y="282" font-family="ui-monospace,SFMono-Regular,monospace" font-size="11" fill="#d97758">{{ governing_law }}</text>
+          <text class="val-law" x="104" y="282" font-family="system-ui,sans-serif" font-size="11.5" fill="#1a2332" font-weight="600">California</text>
+          <rect x="42" y="298" width="140" height="4" rx="2" fill="#d4d3cf"/>
+          <rect x="42" y="310" width="100" height="4" rx="2" fill="#d4d3cf"/>
+          <line x1="42" y1="338" x2="120" y2="338" stroke="#2a2a28" stroke-width="1"/>
+          <line x1="152" y1="338" x2="230" y2="338" stroke="#2a2a28" stroke-width="1"/>
+        </g>
+        <g class="input-show">
+          <rect x="20" y="378" width="240" height="36" rx="8" fill="#f5f3ef" stroke="#e0ddd8" stroke-width="1"/>
+          <text x="34" y="401" font-family="system-ui,sans-serif" font-size="13" fill="#999" font-weight="500">&#x203a;</text>
+        </g>
+        <g class="msg-prepare">
+          <text x="46" y="400" font-family="system-ui,sans-serif" font-size="11.5" fill="#2a2a28">Prepare a mutual NDA with Codraft<tspan class="blink" fill="#d97758" dx="1">|</tspan></text>
+        </g>
+        <g class="msg-acme">
+          <text x="46" y="400" font-family="system-ui,sans-serif" font-size="11.5" fill="#2a2a28">I am Acme Corp<tspan class="blink" fill="#d97758" dx="1">|</tspan></text>
+        </g>
+        <g class="msg-date">
+          <text x="46" y="400" font-family="system-ui,sans-serif" font-size="11.5" fill="#2a2a28">Use today's date<tspan class="blink" fill="#d97758" dx="1">|</tspan></text>
+        </g>
+        <g class="msg-cali">
+          <text x="46" y="400" font-family="system-ui,sans-serif" font-size="11.5" fill="#2a2a28">We live in California<tspan class="blink" fill="#d97758" dx="1">|</tspan></text>
+        </g>
+        <g class="msg-awesome">
+          <text x="46" y="400" font-family="system-ui,sans-serif" font-size="11.5" fill="#2a2a28">That's awesome Codraft!<tspan class="blink" fill="#d97758" dx="1">|</tspan></text>
+        </g>
+      </svg>
   actions:
     - text: Get Started
       link: /codraft/start-here/introduction/
@@ -16,10 +170,7 @@ hero:
     - text: Feature Tour
       link: /codraft/feature-tour/easy-to-install/
       icon: rocket
-      variant: minimal
-    - text: GitHub
-      link: https://github.com/houfu/codraft
-      icon: external
+      variant: secondary
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
@@ -28,29 +179,32 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
   <Card title="1. Add Your Template" icon="document">
-    Place a `.docx` or `.html` template in `templates/`, using `{{ variable_name }}` placeholders wherever you need dynamic content.
+    Drop a Word, HTML, or Markdown file into `templates/`. Add `{{ placeholders }}` where content changes. That's a working template — no form builder, no configuration file.
   </Card>
   <Card title="2. Claude Interviews You" icon="puzzle">
-    Tell Claude to "prepare a [document type]". Claude finds the template and walks you through a natural conversation — skipping irrelevant sections, letting you answer in any order, and collecting lists with an "add another?" flow.
+    Tell Claude to "prepare a [document type] with Codraft". Claude finds the template and walks you through a natural conversation — skipping irrelevant sections, letting you answer in any order, and collecting lists with an "add another?" flow.
   </Card>
   <Card title="3. Get Your Document" icon="approve-check">
-    After confirming all values, the completed document is rendered and saved to `output/`. Docx templates produce `.docx` files; HTML templates produce both `.html` and `.pdf`.
+    Confirm the collected values and the finished document is rendered to `output/` — Word, HTML, or Markdown with an optional PDF, plus a transcript of the entire interview.
   </Card>
 </CardGrid>
 
 ## Features
 
 <CardGrid>
-  <Card title="Natural Conversation" icon="comment">
-    Claude interviews you — not a form. Handle messy input, point to documents or photos instead of typing, change your mind mid-way. Ambiguity becomes dialogue, not an error.
+  <Card title="Talk, Don't Type" icon="comment">
+    Claude interviews you through a conversation, not a form. Answer in any order, point to a photo instead of typing, change your mind mid-way. Ambiguity gets clarified, not rejected.
   </Card>
-  <Card title="Zero Infrastructure" icon="laptop">
-    No server. No database. For individuals, Codraft runs inside Claude with nothing to host. For organisations deploying Claude at scale, it ships as a Claude Code plugin and rolls out in minutes.
+  <Card title="Templates You Already Have" icon="document">
+    Use Word, HTML, or Markdown files — no proprietary format, no vendor lock-in. Add `{{ placeholders }}` where content changes. If you have existing documents, you may already have templates that work.
   </Card>
-  <Card title="Conditional Logic" icon="setting">
-    Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers. The interview skips irrelevant questions automatically.
+  <Card title="No Interview to Build" icon="star">
+    In other tools, writing the template is half the work — then you build the form separately. Codraft reads your template and generates the interview automatically. Add a variable, the question appears. Remove it, the question disappears.
   </Card>
-  <Card title="Repeating Sections" icon="list-format">
-    Use `{% for item in items %}` loops for line items, milestones, or any repeating content. Claude collects entries one at a time with a natural "add another?" flow.
+  <Card title="Your Files Stay Local" icon="laptop">
+    Templates and output live on your machine. No cloud uploads, no SaaS account, no subscription. Share your setup with a colleague by zipping the folder.
+  </Card>
+  <Card title="Built-In Audit Trail" icon="open-book">
+    Every session saves a human-readable transcript and a structured interview log alongside your document. See exactly what was asked, what was answered, and what ended up in the final output.
   </Card>
 </CardGrid>

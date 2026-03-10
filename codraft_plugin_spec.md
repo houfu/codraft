@@ -74,11 +74,8 @@ codraft-plugin/
 │       │   └── Bonterms-Mutual-NDA.docx
 │       ├── invoice/
 │       │   └── invoice.html
-│       ├── consulting_agreement/
-│       │   ├── Consulting-Agreement.docx
-│       │   └── config.yaml
-│       └── event_invitation/
-│           ├── event-invitation.html
+│       └── meeting_notes/
+│           ├── meeting_notes.md
 │           └── config.yaml
 └── README.md
 ```

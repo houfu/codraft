@@ -3,7 +3,7 @@ title: Template Authoring
 description: Complete guide to writing Codraft templates — placeholders, conditionals, loops, and rules
 ---
 
-Codraft templates are standard `.docx` or `.html` files with Jinja2-style markup embedded in the content. This guide covers everything you need to write templates that work correctly with the interview engine.
+Codraft templates are standard `.docx`, `.html`, or `.md` files with Jinja2-style markup embedded in the content. This guide covers everything you need to write templates that work correctly with the interview engine.
 
 ## Placeholders
 
@@ -81,7 +81,7 @@ Claude collects the first item's fields, then asks *"Would you like to add anoth
 
 ## Rules and constraints
 
-- **One template file per directory** — each template directory contains exactly one `.docx` or `.html` file, not both
+- **One template file per directory** — each template directory contains exactly one `.docx`, `.html`, or `.md` file, not mixed
 - **Single-level nesting only** — do not place `{% for %}` inside `{% if %}`, or `{% if %}` inside `{% for %}`
 - **No `{% elif %}`** — use separate `{% if %}` blocks instead
 - **No expressions** — `{{ price * quantity }}` is not supported; collect pre-calculated values from the user
@@ -89,12 +89,13 @@ Claude collects the first item's fields, then asks *"Would you like to add anoth
 
 ## File format differences
 
-| Feature | `.docx` | `.html` |
-|---------|---------|---------|
-| Engine | `docxtpl` | `jinja2` |
-| Output | `.docx` | `.html` + `.pdf` |
-| Formatting | Preserved from template | Controlled by CSS |
-| Syntax | Same Jinja2 syntax | Same Jinja2 syntax |
-| Tables | Native Word tables | HTML `<table>` |
+| Feature | `.docx` | `.html` | `.md` |
+|---------|---------|---------|-------|
+| Engine | `docxtpl` | `jinja2` | `jinja2` |
+| Output | `.docx` + optional `.pdf` | `.html` + `.pdf` | `.md` + optional `.pdf` |
+| Formatting | Preserved from template | Controlled by CSS | Standard Markdown rendering |
+| Syntax | Same Jinja2 syntax | Same Jinja2 syntax | Same Jinja2 syntax |
+| Tables | Native Word tables | HTML `<table>` | Markdown tables |
+| Best for | Legal docs, formatted contracts | Invoices, web-ready documents | Meeting notes, internal records |
 
-For legal documents where formatting matters (line spacing, fonts, headers), `.docx` is usually the right choice. For documents that will be sent digitally or embedded in web workflows, `.html` + PDF is more flexible.
+For legal documents where formatting matters (line spacing, fonts, headers), `.docx` is usually the right choice. For documents that will be sent digitally or embedded in web workflows, `.html` + PDF is more flexible. For lightweight documents like meeting notes, action item lists, or internal records, `.md` is the simplest option — it's easy to author, version-control friendly, and can optionally produce a PDF.

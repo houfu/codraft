@@ -1,7 +1,7 @@
 ![Codraft Logo](./docs/public/images/logo.png)
 # Codraft
 
-Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
+Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document with Codraft. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
 
 ## How It Works
 
@@ -10,7 +10,7 @@ Codraft is a document assembly tool for people already working with Claude and A
 3. Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers
 4. Use `{% for item in items %}` blocks for repeating sections (e.g., line items, milestones)
 5. Optionally add a `config.yaml` to customize questions, grouping, and validation
-6. Ask Claude to "prepare a [document type]"
+6. Ask Claude to "prepare a [document type] with Codraft"
 7. Claude walks you through a conversational interview -- skipping irrelevant sections and collecting lists naturally
 8. A completed document is rendered and saved to a job folder in `output/`
 
@@ -39,7 +39,7 @@ From within Claude Code:
 
 1. Add the marketplace: `/plugin marketplace add houfu/codraft`
 2. Install the plugin: `/plugin install codraft@codraft`
-3. Say "prepare an NDA" to try it out with a built-in template
+3. Say "prepare an NDA with Codraft" to try it out with a built-in template
 
 ## Quick Start
 
@@ -65,7 +65,7 @@ templates/
 
 Tell Claude:
 
-> "I need to prepare an NDA"
+> "I need to prepare an NDA with Codraft"
 
 Claude will find the template, extract its variables, and interview you for the values -- grouping related fields together for a natural flow.
 
@@ -95,21 +95,18 @@ output/
 Templates can include or exclude sections based on user answers. The interview automatically skips questions that aren't relevant.
 
 ```
-{% if include_ip_assignment %}
-The Consultant hereby assigns all intellectual property
-created during the engagement to {{ ip_ownership_entity }},
-effective {{ ip_assignment_date }}.
+{% if decisions_made %}
+## Decisions
+{{ decisions }}
 {% endif %}
 ```
 
 Equality conditions are also supported:
 
 ```
-{% if payment_method == 'bank_transfer' %}
-Bank: {{ bank_name }}
-Account: {{ account_number }}
-{% else %}
-Payment will be made via {{ payment_method }}.
+{% if meeting_type == 'workshop' %}
+### Workshop Materials
+{{ workshop_materials }}
 {% endif %}
 ```
 
@@ -118,10 +115,8 @@ Payment will be made via {{ payment_method }}.
 Templates can have repeating sections. The interview collects items one at a time with an "add another?" flow.
 
 ```
-{% for milestone in milestones %}
-Milestone: {{ milestone.description }}
-Due Date: {{ milestone.date }}
-Amount: {{ milestone.amount }}
+{% for item in action_items %}
+- **{{ item.description }}** — Assigned to: {{ item.assignee }}, Due: {{ item.due_date }}
 {% endfor %}
 ```
 
@@ -131,35 +126,36 @@ Template developers can place an optional `config.yaml` alongside their template
 
 ```yaml
 meta:
-  display_name: "Consulting Agreement"
-  description: "Standard consulting engagement agreement"
+  display_name: "Meeting Notes"
+  description: "Structured meeting notes with action items and optional sections"
 
 variables:
-  client_name:
-    label: "Client's Legal Name"
-    question: "What is the client's full legal name?"
+  meeting_title:
+    label: "Meeting Title"
+    question: "What is the title of this meeting?"
     required: true
-  payment_method:
+  meeting_type:
     type: choice
-    choices: [bank_transfer, cheque, crypto]
-    default: "bank_transfer"
-  include_ip_assignment:
+    choices: [standup, workshop, review]
+    default: "standup"
+  decisions_made:
     type: boolean
+    question: "Were any decisions made during this meeting?"
     default: false
 
 groups:
-  - name: "Parties"
-    variables: [client_name, client_address]
-  - name: "IP Assignment"
-    condition: include_ip_assignment
-    variables: [ip_ownership_entity, ip_assignment_date]
-  - name: "Milestones"
-    loop: milestones
-    variables: [description, date, amount]
+  - name: "Meeting Details"
+    variables: [meeting_title, meeting_date, meeting_type, facilitator_name]
+  - name: "Workshop Materials"
+    condition: "meeting_type == 'workshop'"
+    variables: [workshop_materials]
+  - name: "Action Items"
+    loop: action_items
+    variables: [description, assignee, due_date]
 
 validation:
-  - rule: "end_date > effective_date"
-    message: "The end date must be after the effective date"
+  - rule: "next_meeting_date > meeting_date"
+    message: "The next meeting date must be after this meeting's date"
 ```
 
 Config features include:
@@ -213,9 +209,8 @@ Two condition forms are supported:
 Use `{% for %}` / `{% endfor %}` for repeating sections:
 
 ```
-{% for service in services %}
-Service: {{ service.description }}
-Fee: {{ service.fee }}
+{% for item in action_items %}
+- {{ item.description }} — Assigned to: {{ item.assignee }}, Due: {{ item.due_date }}
 {% endfor %}
 ```
 
@@ -269,11 +264,8 @@ codraft/
 │   │   │   └── Bonterms-Mutual-NDA.docx
 │   │   ├── invoice/
 │   │   │   └── invoice.html
-│   │   ├── consulting_agreement/     # v2 example (conditionals + loops)
-│   │   │   ├── Consulting-Agreement.docx
-│   │   │   └── config.yaml
-│   │   └── event_invitation/         # v2 example (conditionals + loops)
-│   │       ├── event-invitation.html
+│   │   └── meeting_notes/            # v2 example (conditionals + loops + config)
+│   │       ├── meeting_notes.md
 │   │       └── config.yaml
 │   └── <your_template>/              # Your templates (gitignored)
 │       ├── <name>.docx or .html

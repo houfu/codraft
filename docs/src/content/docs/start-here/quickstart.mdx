@@ -49,10 +49,10 @@ Skip this step if you already have a Claude Pro or Max account and downloaded th
     Type a natural request:
 
     ```
-    Prepare a mutual NDA.
+    Prepare a mutual NDA with Codraft.
     ```
 
-    ![Screenshot showing the Cowork screen with the Codraft folder selected, and a prompt "Prepare a mtual NDA" is entered.](/codraft/images/quickstarts/Codraft-start.png)
+    ![Screenshot showing the Cowork screen with the Codraft folder selected, and a prompt "Prepare a mutual NDA with Codraft" is entered.](/codraft/images/quickstarts/Codraft-start.png)
 
 2. **Claude prepares the NDA**
 
@@ -142,20 +142,23 @@ The first time you run Codraft on a template, Claude is running code to analyse 
    ```
    Done! Your NDA has been saved to:
    output/Bonterms_Mutual_NDA_Acme_Corp_2026-03-01/Bonterms-Mutual-NDA.docx
+
+   A transcript of this session has been saved to transcript.md in the job folder.
    ```
 
-   Open the `.docx` file in Word, Google Docs, or any compatible application to review the final document.
+   Open the `.docx` file in Word, Google Docs, or any compatible application to review the final document. The `transcript.md` records the full interview — questions, answers, and confirmed values — so you can review what was discussed without scrolling through the chat.
 
      ![Screenshot showing the Cowork screen with the a pane on the right showing the rendered contract.](/codraft/images/quickstarts/Quickstart-results.png)
 </Steps>
 
 ## What just happened
 
-Behind the scenes, Codraft ran three steps:
+Behind the scenes, Codraft ran four steps:
 
 1. **Discovery** -- Claude matched "mutual NDA" to the `Bonterms_Mutual_NDA` template directory
 2. **Analysis** -- The Analyzer skill parsed the `.docx` template, extracted all 13 variables, and produced a `manifest.yaml`
 3. **Rendering** -- After you confirmed the values, the Renderer skill used `docxtpl` to fill in the template and saved the output
+4. **Transcript** -- The Transcriber skill wrote a human-readable `transcript.md` recording the interview alongside your document
 
 ## Ready to explore more?
 

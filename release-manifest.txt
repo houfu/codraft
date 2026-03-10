@@ -1,4 +1,5 @@
 .claude/
+scripts/
 templates/_examples/
 CLAUDE.md
 README.md

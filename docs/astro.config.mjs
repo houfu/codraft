@@ -67,7 +67,6 @@ export default defineConfig({
             { label: 'Variable Types', slug: 'reference/variable-types' },
             { label: 'config.yaml Reference', slug: 'reference/config-yaml' },
             { label: 'Project Structure', slug: 'reference/project-structure' },
-            { label: 'Roadmap', slug: 'reference/roadmap' },
           ],
         },
         { label: 'Changelog', slug: 'changelog' },

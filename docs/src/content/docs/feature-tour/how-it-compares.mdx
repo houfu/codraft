@@ -18,7 +18,7 @@ Traditional document assembly tools were built for IT departments and law firms 
 | **Output formats** | docx, HTML, PDF | PDF, DOCX, and others | DOCX, PDF | DOCX, PDF | DOCX, PDF |
 | **Hosting required** | No | Yes | Yes | No (SaaS) | No (SaaS) |
 | **Multi-user access** | No | Yes | Yes | Yes | Yes |
-| **Audit trail** | No | Yes | Yes | Yes | Yes |
+| **Audit trail** | Per-document ² | Yes | Yes | Yes | Yes |
 | **Role management** | No | Yes | Yes | Yes | Yes |
 | **SSO / enterprise auth** | No | Configurable | Yes | Yes | Yes |
 | **API / integrations** | Via MCP ¹ | API + webhooks | Enterprise API | Webhooks + Zapier | API |
@@ -26,6 +26,8 @@ Traditional document assembly tools were built for IT departments and law firms 
 | **Requires Claude** | Yes | No | No | No | No |
 
 ¹ Codraft has no built-in integrations of its own. Because it runs inside Claude, it can use any [MCP](https://modelcontextprotocol.io/) server configured in your Claude environment during the interview — giving it access to CRMs, databases, document stores, and other tools without any integration work on Codraft's part.
+
+² Every document assembly session saves a `transcript.md` (human-readable record of questions and answers) and `interview_log.json` (structured data) alongside the rendered output. This provides a per-document audit trail but not a centralised audit log across sessions.
 
 ## Tool by tool
 
@@ -71,9 +73,9 @@ Bryter has added generative AI workflow features, but interview generation from 
 
 - Regulated intake forms requiring exact question order and wording
 - Building a system for end users who do not have Claude Cowork or Claude Code
-- Multi-user access, role management, or audit trails required
+- Multi-user access or role management required
 - Your organisation cannot send document data through a Claude session
-- You need `{% elif %}`, nested blocks, or computed fields (on the roadmap, not available yet)
+- You need `{% elif %}`, nested blocks, or computed fields (not available yet)
 
 <Aside type="tip">
   The [Limitations](/codraft/feature-tour/limitations/) page covers Codraft's specific technical and safety constraints in detail.
