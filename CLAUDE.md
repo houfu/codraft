@@ -1,6 +1,6 @@
-# Codraft -- Project Instructions
+# CoQuill -- Project Instructions
 
-Codraft is a document assembly tool built as Claude Cowork skills.
+CoQuill is a document assembly tool built as Claude Cowork skills.
 
 ## Project Structure
 
@@ -21,8 +21,8 @@ Codraft is a document assembly tool built as Claude Cowork skills.
 
 | Channel | How to get it | Target user |
 |---|---|---|
-| **Cowork zip** | GitHub Releases (`codraft-v*.zip`) | Claude Cowork users |
-| **Claude Code plugin** | `/plugin marketplace add houfu/codraft` | Claude Code users |
+| **Cowork zip** | GitHub Releases (`coquill-v*.zip`) | Claude Cowork users |
+| **Claude Code plugin** | `/plugin marketplace add houfu/coquill` | Claude Code users |
 
 Plugin metadata: `plugin/.claude-plugin/plugin.json` (version `0.0.0`, overwritten at release). Marketplace manifest: `.claude-plugin/marketplace.json`. GitHub Action assembles `build/plugin/` (gitignored).
 
@@ -30,10 +30,10 @@ Plugin metadata: `plugin/.claude-plugin/plugin.json` (version `0.0.0`, overwritt
 
 | Skill | Location | Purpose |
 |---|---|---|
-| **Orchestrator** | `.claude/skills/codraft/SKILL.md` | User-facing entry point. Discovery, interview, confirmation, post-render. |
-| **Analyzer** | `.claude/skills/codraft-analyzer/SKILL.md` | Delegates to `scripts/analyze.py`. Template parsing, manifest generation. |
-| **Renderer** | `.claude/skills/codraft-renderer/SKILL.md` | Delegates to `scripts/render.py`. Docx/HTML/Markdown rendering, validation. |
-| **Transcriber** | `.claude/skills/codraft-transcriber/SKILL.md` | Delegates to `scripts/transcribe.py`. Interview transcript generation. |
+| **Orchestrator** | `.claude/skills/coquill/SKILL.md` | User-facing entry point. Discovery, interview, confirmation, post-render. |
+| **Analyzer** | `.claude/skills/coquill-analyzer/SKILL.md` | Delegates to `scripts/analyze.py`. Template parsing, manifest generation. |
+| **Renderer** | `.claude/skills/coquill-renderer/SKILL.md` | Delegates to `scripts/render.py`. Docx/HTML/Markdown rendering, validation. |
+| **Transcriber** | `.claude/skills/coquill-transcriber/SKILL.md` | Delegates to `scripts/transcribe.py`. Interview transcript generation. |
 
 The Orchestrator invokes sub-skills via prompt-level instructions. Analyzer, Renderer, and Transcriber are thin wrappers that delegate procedural logic to Python scripts.
 
@@ -45,6 +45,6 @@ The Orchestrator invokes sub-skills via prompt-level instructions. Analyzer, Ren
 
 ## When Working on This Project
 
-- Specs: `codraft_v2_spec.md` (v2), `codraft_mvp_spec.md` (original MVP)
+- Specs: `coquill_v2_spec.md` (v2), `coquill_mvp_spec.md` (original MVP)
 - Test templates go in `templates/` subdirectories; rendered output goes to `output/`
 - Never overwrite template files

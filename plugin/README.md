@@ -1,22 +1,22 @@
-# Codraft
+# CoQuill
 
-Codraft is a document assembly tool built as a Claude Code plugin. It interviews users conversationally, collects the information needed to fill in a template, and renders completed documents. Templates support variable substitution, conditional sections, loops, and optional developer configuration.
+CoQuill is a document assembly tool built as a Claude Code plugin. It interviews users conversationally, collects the information needed to fill in a template, and renders completed documents. Templates support variable substitution, conditional sections, loops, and optional developer configuration.
 
 ## Installation
 
-Install Codraft in Claude Code:
+Install CoQuill in Claude Code:
 
 ```
-/plugin marketplace add houfu/codraft
-/plugin install codraft@codraft
+/plugin marketplace add houfu/coquill
+/plugin install coquill@coquill
 ```
 
 ## Quick Start
 
-Once installed, ask Claude to prepare a document with Codraft using one of the built-in example templates:
+Once installed, ask Claude to prepare a document with CoQuill using one of the built-in example templates:
 
-- "Prepare an NDA with Codraft"
-- "Prepare an invoice with Codraft"
+- "Prepare an NDA with CoQuill"
+- "Prepare an invoice with CoQuill"
 
 Claude will walk you through an interview, asking for the information needed to complete the document, then render the final output.
 
@@ -45,4 +45,4 @@ You can also add an optional `config.yaml` alongside the template to customize i
 
 For full documentation on template authoring, config.yaml options, conditional logic, loops, and more, visit:
 
-https://github.com/houfu/codraft
+https://github.com/houfu/coquill

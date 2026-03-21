@@ -7,10 +7,10 @@ import { Aside } from '@astrojs/starlight/components';
 
 A guided interview asks a fixed sequence of questions, each answer feeding into a predetermined next step. The system only understands inputs it was programmed to handle. You adapt to it.
 
-Codraft works the other way around. Claude understands language, context, and intent — so the interview adapts to you.
+CoQuill works the other way around. Claude understands language, context, and intent — so the interview adapts to you.
 
 <Aside type="note">
-  Every tool in this space -- Docassemble, HotDocs, Gavel, Knackly -- conducts the interview as a guided form: fixed questions, fixed order, one field at a time. The conversational approach is specific to Codraft.
+  Every tool in this space -- Docassemble, HotDocs, Gavel, Knackly -- conducts the interview as a guided form: fixed questions, fixed order, one field at a time. The conversational approach is specific to CoQuill.
 </Aside>
 
 ## You do not have to follow the order
@@ -119,7 +119,7 @@ The result is a list that feeds directly into the `{% for %}` loop in the templa
 
 ## Review before you commit
 
-Once the interview is complete, Codraft shows you everything it collected before rendering — grouped by section, with loop items numbered and any skipped conditional sections marked as not applicable. You can edit any value before the document is produced.
+Once the interview is complete, CoQuill shows you everything it collected before rendering — grouped by section, with loop items numbered and any skipped conditional sections marked as not applicable. You can edit any value before the document is produced.
 
 ```
 Claude: Here's what I have — let me know if anything needs changing:
@@ -147,4 +147,4 @@ Nothing is written to disk until you confirm. If you spot an error, you correct 
 
 ---
 
-The trade-off is that a conversation is less predictable than a form. The [Limitations](/codraft/feature-tour/limitations/) page covers what Codraft cannot do. But for the interview itself, the lack of rigid determinism is the point.
+The trade-off is that a conversation is less predictable than a form. The [Limitations](/coquill/feature-tour/limitations/) page covers what CoQuill cannot do. But for the interview itself, the lack of rigid determinism is the point.

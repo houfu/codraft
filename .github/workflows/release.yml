@@ -42,7 +42,7 @@ jobs:
 
       - name: Build Cowork ZIP
         run: |
-          ZIP_NAME="codraft-v${TAG}.zip"
+          ZIP_NAME="coquill-v${TAG}.zip"
           while IFS= read -r line || [[ -n "$line" ]]; do
             [ -z "$line" ] && continue
             [ "${line:0:1}" = "#" ] && continue
@@ -52,20 +52,20 @@ jobs:
           echo "ZIP_NAME=$ZIP_NAME" >> $GITHUB_ENV
 
       - name: Package plugin ZIP
-        run: zip -r "codraft-plugin-v${TAG}.zip" plugin/
+        run: zip -r "coquill-plugin-v${TAG}.zip" plugin/
 
       - name: Create latest-named aliases
         run: |
-          cp "codraft-v${TAG}.zip" codraft-latest.zip
-          cp "codraft-plugin-v${TAG}.zip" codraft-plugin-latest.zip
+          cp "coquill-v${TAG}.zip" coquill-latest.zip
+          cp "coquill-plugin-v${TAG}.zip" coquill-plugin-latest.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Codraft v${{ env.VERSION }} ${{ env.CODENAME }}"
+          name: "CoQuill v${{ env.VERSION }} ${{ env.CODENAME }}"
           files: |
             ${{ env.ZIP_NAME }}
-            codraft-plugin-v${{ env.TAG }}.zip
-            codraft-latest.zip
-            codraft-plugin-latest.zip
+            coquill-plugin-v${{ env.TAG }}.zip
+            coquill-latest.zip
+            coquill-plugin-latest.zip
           generate_release_notes: true

@@ -1,15 +1,15 @@
-# Codraft — v2 Specification
+# CoQuill — v2 Specification
 
 **Version:** 0.2
 **Date:** 2026-02-16
 **Platform:** Claude Cowork
-**Extends:** `codraft_mvp_spec.md` (v0.1)
+**Extends:** `coquill_mvp_spec.md` (v0.1)
 
 ---
 
 ## 1. Overview
 
-v2 adds four capabilities to Codraft:
+v2 adds four capabilities to CoQuill:
 
 1. **Conditional logic** — templates can use `{% if %}` / `{% else %}` / `{% endif %}` to include or exclude sections based on variable values. The interview skips questions that aren't relevant.
 2. **Loops** — templates can use `{% for item in items %}` / `{% endfor %}` for repeating sections. The interview collects lists with an "add another?" flow.
@@ -37,11 +37,11 @@ v2 splits the single SKILL.md into three skills:
 
 | Skill | Location | Purpose | Triggered by |
 |---|---|---|---|
-| **Orchestrator** | `.claude/skills/codraft/SKILL.md` | Entry point. Discovery, interview, confirmation, post-render. | User ("prepare an NDA") |
-| **Analyzer** | `.claude/skills/codraft-analyzer/SKILL.md` | Template parsing, variable extraction, manifest generation. | Orchestrator |
-| **Renderer** | `.claude/skills/codraft-renderer/SKILL.md` | Docx/HTML rendering, output validation. | Orchestrator |
+| **Orchestrator** | `.claude/skills/coquill/SKILL.md` | Entry point. Discovery, interview, confirmation, post-render. | User ("prepare an NDA") |
+| **Analyzer** | `.claude/skills/coquill-analyzer/SKILL.md` | Template parsing, variable extraction, manifest generation. | Orchestrator |
+| **Renderer** | `.claude/skills/coquill-renderer/SKILL.md` | Docx/HTML rendering, output validation. | Orchestrator |
 
-The Orchestrator is the only user-facing skill. It invokes the Analyzer and Renderer via prompt-level instructions (e.g., "Run the codraft-analyzer skill on this template directory").
+The Orchestrator is the only user-facing skill. It invokes the Analyzer and Renderer via prompt-level instructions (e.g., "Run the coquill-analyzer skill on this template directory").
 
 ### 2.2 Skill Interface Contracts
 
@@ -516,22 +516,22 @@ The renderer requires minimal changes because `docxtpl` and `jinja2` natively su
 ## 8. Directory Structure (v2)
 
 ```
-codraft/
+coquill/
 ├── CLAUDE.md
 ├── README.md
 ├── LICENSE
 ├── .gitignore
 ├── .claude/
 │   └── skills/
-│       ├── codraft/
+│       ├── coquill/
 │       │   └── SKILL.md              # Orchestrator (entry point)
-│       ├── codraft-analyzer/
+│       ├── coquill-analyzer/
 │       │   └── SKILL.md              # Analyzer
-│       └── codraft-renderer/
+│       └── coquill-renderer/
 │           └── SKILL.md              # Renderer
 ├── docs/
-│   ├── codraft_mvp_spec.md           # MVP specification
-│   └── codraft_v2_spec.md            # This file
+│   ├── coquill_mvp_spec.md           # MVP specification
+│   └── coquill_v2_spec.md            # This file
 ├── templates/
 │   ├── _examples/
 │   │   ├── Bonterms_Mutual_NDA/

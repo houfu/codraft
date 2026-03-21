@@ -1,4 +1,4 @@
-"""Codraft Analyzer — parse a template and generate manifest.yaml."""
+"""CoQuill Analyzer — parse a template and generate manifest.yaml."""
 
 import argparse
 import os
@@ -417,7 +417,7 @@ def build_manifest(
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Analyze a Codraft template and generate manifest.yaml"
+        description="Analyze a CoQuill template and generate manifest.yaml"
     )
     parser.add_argument("template_dir", help="Path to the template directory")
     parser.add_argument(

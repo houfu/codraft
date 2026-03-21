@@ -1,9 +1,9 @@
 ---
 title: Template Authoring
-description: Complete guide to writing Codraft templates — placeholders, conditionals, loops, and rules
+description: Complete guide to writing CoQuill templates — placeholders, conditionals, loops, and rules
 ---
 
-Codraft templates are standard `.docx`, `.html`, or `.md` files with Jinja2-style markup embedded in the content. This guide covers everything you need to write templates that work correctly with the interview engine.
+CoQuill templates are standard `.docx`, `.html`, or `.md` files with Jinja2-style markup embedded in the content. This guide covers everything you need to write templates that work correctly with the interview engine.
 
 ## Placeholders
 
@@ -19,7 +19,7 @@ This Agreement is entered into by {{ disclosing_party_name }}
 - Variable names must be valid Python identifiers: lowercase letters, numbers, and underscores; no spaces or hyphens
 - The same variable can appear any number of times — it is collected once and substituted everywhere
 
-In `.docx` files, place placeholders directly in the document text. Codraft uses `docxtpl`, which preserves all formatting around the placeholder. In `.html` files, placeholders can appear anywhere in the body, attributes, or `<style>` blocks.
+In `.docx` files, place placeholders directly in the document text. CoQuill uses `docxtpl`, which preserves all formatting around the placeholder. In `.html` files, placeholders can appear anywhere in the body, attributes, or `<style>` blocks.
 
 ## Conditional sections
 

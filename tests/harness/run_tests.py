@@ -1,4 +1,4 @@
-"""Codraft test runner.
+"""CoQuill test runner.
 
 Usage:
     uv run harness/run_tests.py                        # run all scenarios

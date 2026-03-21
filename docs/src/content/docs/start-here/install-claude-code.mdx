@@ -1,12 +1,12 @@
 ---
 title: "Install: Claude Code"
-description: Add Codraft to Claude Code with one command
+description: Add CoQuill to Claude Code with one command
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
 <Aside type="note">
-  The canonical Codraft setup is Claude Cowork with the folder download -- no terminal required. This page covers installation for users who prefer to work in Claude Code.
+  The canonical CoQuill setup is Claude Cowork with the folder download -- no terminal required. This page covers installation for users who prefer to work in Claude Code.
 </Aside>
 
 ## Prerequisites
@@ -22,16 +22,16 @@ You need the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI i
    Run the following command in your terminal:
 
    ```bash
-   /plugin marketplace add houfu/codraft
+   /plugin marketplace add houfu/coquill
    ```
 
 2. **Verify the install**
 
-   Run `/skills` in Claude Code and confirm that `codraft` appears in the list of available skills.
+   Run `/skills` in Claude Code and confirm that `coquill` appears in the list of available skills.
 
 3. **Run your first document**
 
-   Tell Claude: *"Prepare a mutual NDA with Codraft"*
+   Tell Claude: *"Prepare a mutual NDA with CoQuill"*
 
    Claude should find the bundled Bonterms Mutual NDA template and start the interview.
 
@@ -43,5 +43,5 @@ On the first run, Claude installs the required Python packages (`docxtpl`, `pyya
 
 ## Next steps
 
-- [Quickstart](/codraft/start-here/quickstart/) -- prepare your first document in under five minutes
-- [Feature Tour](/codraft/feature-tour/easy-to-install/) -- see what Codraft can do
+- [Quickstart](/coquill/start-here/quickstart/) -- prepare your first document in under five minutes
+- [Feature Tour](/coquill/feature-tour/easy-to-install/) -- see what CoQuill can do

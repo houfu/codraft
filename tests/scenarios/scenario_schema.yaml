@@ -1,4 +1,4 @@
-# Schema for Codraft test scenario files
+# Schema for CoQuill test scenario files
 # Each scenario tests one aspect of the rendering pipeline.
 
 # Required fields:

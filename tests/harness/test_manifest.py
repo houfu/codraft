@@ -1,4 +1,4 @@
-"""Codraft Analyzer manifest tests.
+"""CoQuill Analyzer manifest tests.
 
 Usage:
     uv run harness/test_manifest.py

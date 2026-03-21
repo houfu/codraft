@@ -7,11 +7,11 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## Your files never leave your machine
 
-Templates, rendered documents, and output files are all local. Codraft reads your templates from disk and writes finished documents back to your `output/` folder. Nothing is uploaded to a third-party service and no cloud rendering is involved.
+Templates, rendered documents, and output files are all local. CoQuill reads your templates from disk and writes finished documents back to your `output/` folder. Nothing is uploaded to a third-party service and no cloud rendering is involved.
 
 ## The interview goes through Claude
 
-When Codraft interviews you for variable values, those answers are part of your Claude conversation. They are subject to [Anthropic's privacy policy](https://www.anthropic.com/legal/privacy) -- the same as anything else you type in Claude Cowork or Claude Code.
+When CoQuill interviews you for variable values, those answers are part of your Claude conversation. They are subject to [Anthropic's privacy policy](https://www.anthropic.com/legal/privacy) -- the same as anything else you type in Claude Cowork or Claude Code.
 
 For most documents this is fine. For highly sensitive information -- personal identification numbers, financial account details, confidential terms -- consider what you are comfortable sharing in a Claude session before proceeding.
 
@@ -19,24 +19,24 @@ For most documents this is fine. For highly sensitive information -- personal id
 
 <Aside>This section describes **Claude Cowork**. Conditions in other environments may vary. </Aside>
 
-When Codraft runs Python scripts to analyse templates and render documents, those scripts execute inside Claude Cowork's built-in Linux container. The container drops all privileges, isolates the process from the rest of your system, and routes outbound network traffic through a controlled proxy. Even if something went wrong inside the script, it could not affect your host machine.
+When CoQuill runs Python scripts to analyse templates and render documents, those scripts execute inside Claude Cowork's built-in Linux container. The container drops all privileges, isolates the process from the rest of your system, and routes outbound network traffic through a controlled proxy. Even if something went wrong inside the script, it could not affect your host machine.
 
 This container isolation is automatic in Cowork — no configuration required. Claude Code has sandboxing available too, but it is opt-in and configured separately.
 
 ## Everything is auditable
 
-Codraft is a folder of text files. Configuration lives in plain YAML. The skills themselves are Markdown files — you can read exactly what instructions Claude is following, in plain English, before you run anything.
+CoQuill is a folder of text files. Configuration lives in plain YAML. The skills themselves are Markdown files — you can read exactly what instructions Claude is following, in plain English, before you run anything.
 
-There is no compiled binary, no minified JavaScript, and no remote configuration to trust. If you want to know what Codraft does, open the files.
+There is no compiled binary, no minified JavaScript, and no remote configuration to trust. If you want to know what CoQuill does, open the files.
 
 ## No additional third parties
 
-Beyond Anthropic's API, Codraft introduces no external services. The Python packages it uses (`docxtpl`, `jinja2`, `weasyprint`, `pyyaml`) run locally and make no network requests during rendering, unless your HTML template references external resources such as web fonts or remote stylesheets.
+Beyond Anthropic's API, CoQuill introduces no external services. The Python packages it uses (`docxtpl`, `jinja2`, `weasyprint`, `pyyaml`) run locally and make no network requests during rendering, unless your HTML template references external resources such as web fonts or remote stylesheets.
 
 ## How this compares to SaaS tools
 
 Cloud-based document assembly tools -- Gavel, Knackly, Bryter -- process your documents on their servers. Document content, variable values, and sometimes templates are transmitted to and stored by those services.
 
-Codraft renders locally. Output files never leave your machine. The only data that passes through a third-party service is the interview conversation itself -- via Anthropic's API, under Anthropic's privacy policy, the same as any Claude session.
+CoQuill renders locally. Output files never leave your machine. The only data that passes through a third-party service is the interview conversation itself -- via Anthropic's API, under Anthropic's privacy policy, the same as any Claude session.
 
 If your organisation has data residency requirements or cannot use cloud document services, local rendering is a meaningful distinction.

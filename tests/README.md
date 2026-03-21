@@ -1,6 +1,6 @@
-# Codraft Test Suite
+# CoQuill Test Suite
 
-Scenario-based tests that validate Codraft's rendering pipeline.
+Scenario-based tests that validate CoQuill's rendering pipeline.
 
 ## Running Tests
 

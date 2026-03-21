@@ -1,11 +1,11 @@
 ---
-name: codraft-transcriber
-description: "Transcript generator for Codraft. Reads an interview_log.json and manifest.yaml,
-  then writes a human-readable transcript.md to the job folder. Called by the codraft
+name: coquill-transcriber
+description: "Transcript generator for CoQuill. Reads an interview_log.json and manifest.yaml,
+  then writes a human-readable transcript.md to the job folder. Called by the coquill
   orchestrator — not triggered directly by the user."
 ---
 
-# Codraft — Transcript Generator
+# CoQuill — Transcript Generator
 
 You generate a transcript from a completed interview session. The heavy lifting
 is handled by `scripts/transcribe.py`; your job is to invoke it and relay the result.

@@ -1,4 +1,4 @@
-# Codraft Monorepo Migration Spec
+# CoQuill Monorepo Migration Spec
 
 ## Status
 
@@ -13,9 +13,9 @@
 
 ## 1. Goals
 
-1. **Keep the Cowork download lean.** Users who download Codraft to use with Claude Cowork must receive only the files Cowork needs — no docs source, no test fixtures, no CI config.
+1. **Keep the Cowork download lean.** Users who download CoQuill to use with Claude Cowork must receive only the files Cowork needs — no docs source, no test fixtures, no CI config.
 2. **Add a documentation website.** A professional, lawyer-friendly site (Astro + Tailwind, deployed to GitHub Pages) that lives alongside the core project and can be updated atomically with features.
-3. **Add a test/benchmark suite.** A harness for validating that Codraft features work correctly across Cowork, Claude Code, and other coding agents.
+3. **Add a test/benchmark suite.** A harness for validating that CoQuill features work correctly across Cowork, Claude Code, and other coding agents.
 4. **One repo, atomic commits.** A feature, its documentation, and its tests land in a single PR. No cross-repo synchronisation overhead.
 
 ---
@@ -23,16 +23,16 @@
 ## 2. Current Repo Structure
 
 ```
-codraft/
+coquill/
 ├── .claude/
 │   └── skills/
-│       └── codraft/
+│       └── coquill/
 │           └── SKILL.md
 ├── .gitignore
 ├── CLAUDE.md
 ├── README.md
 ├── LICENSE
-├── codraft_mvp_spec.md
+├── coquill_mvp_spec.md
 ├── docs/
 │   └── logo.png
 ├── templates/
@@ -52,13 +52,13 @@ Everything in this repo is currently shipped to every user who clicks "Download 
 ## 3. Proposed Monorepo Structure
 
 ```
-codraft/
+coquill/
 │
 │  ── Core (shipped to Cowork users) ──────────────────────
 │
 ├── .claude/
 │   └── skills/
-│       └── codraft/
+│       └── coquill/
 │           └── SKILL.md                # Orchestrator skill
 ├── templates/
 │   ├── _examples/
@@ -133,7 +133,7 @@ codraft/
 │
 │  ── Project-level config ────────────────────────────────
 │
-├── codraft_mvp_spec.md                 # Full MVP specification
+├── coquill_mvp_spec.md                 # Full MVP specification
 └── .gitignore                          # Updated for monorepo
 ```
 
@@ -157,7 +157,7 @@ templates/_examples/
 CLAUDE.md
 README.md
 LICENSE
-codraft_mvp_spec.md
+coquill_mvp_spec.md
 .gitignore
 ```
 
@@ -177,7 +177,7 @@ Steps:
 
 1. Checkout the repo.
 2. Read `release-manifest.txt`.
-3. Create a ZIP containing only the listed files and directories, named `codraft-v{version}.zip`.
+3. Create a ZIP containing only the listed files and directories, named `coquill-v{version}.zip`.
 4. Create a GitHub Release for the tag.
 5. Attach the ZIP as a release asset.
 
@@ -189,7 +189,7 @@ The README install section changes from:
 
 To:
 
-> Go to the [Releases](https://github.com/{owner}/codraft/releases) page and download the latest `codraft-v*.zip`
+> Go to the [Releases](https://github.com/{owner}/coquill/releases) page and download the latest `coquill-v*.zip`
 
 ---
 
@@ -241,7 +241,7 @@ Key design tokens:
 | Variable Naming Reference  | README naming conventions table    |
 | NDA Walkthrough (example)  | New content, end-to-end demo       |
 | Project Structure          | README + CLAUDE.md structure docs  |
-| MVP Scope & Roadmap        | codraft_mvp_spec.md                |
+| MVP Scope & Roadmap        | coquill_mvp_spec.md                |
 
 **Changelog:**
 
@@ -254,7 +254,7 @@ GitHub Actions workflow (`deploy-docs.yml`):
 - Trigger: push to `main` that touches `docs/**`.
 - Steps: install Node deps, build Astro site, deploy to `gh-pages` branch.
 - GitHub Pages serves from the `gh-pages` branch.
-- Custom domain (optional, future): `docs.codraft.dev` or similar.
+- Custom domain (optional, future): `docs.coquill.dev` or similar.
 
 ### 5.5 Local Development
 
@@ -272,7 +272,7 @@ npm run preview    # preview production build locally
 
 ### 6.1 Purpose
 
-Validate that Codraft's core features work correctly when driven by different coding agents (Cowork, Claude Code, and potentially others). This is not a unit test suite for a Python library — it is a **scenario-based benchmark** that tests the end-to-end flow: template → variable extraction → rendering → output comparison.
+Validate that CoQuill's core features work correctly when driven by different coding agents (Cowork, Claude Code, and potentially others). This is not a unit test suite for a Python library — it is a **scenario-based benchmark** that tests the end-to-end flow: template → variable extraction → rendering → output comparison.
 
 ### 6.2 Test Scenario Format
 
@@ -328,7 +328,7 @@ A Python script (`tests/harness/run_tests.py`) that:
 
 1. Reads a scenario YAML file.
 2. Copies the fixture template into a temporary working directory.
-3. Runs the Codraft rendering pipeline (calls the same Python code the skill invokes) with the provided variable values.
+3. Runs the CoQuill rendering pipeline (calls the same Python code the skill invokes) with the provided variable values.
 4. Compares the output against the expected checks (contains_text, file exists, etc.).
 5. Reports pass/fail per scenario.
 
@@ -389,7 +389,7 @@ This section describes the ordered steps to port the current single-purpose repo
 
 1. **Create `docs/` directory** with Astro project scaffolding.
    - Install the Plasma template (or chosen alternative).
-   - Configure Tailwind with the Codraft design tokens (palette, font).
+   - Configure Tailwind with the CoQuill design tokens (palette, font).
    - Set default theme to light.
    - Remove demo content pages.
 
@@ -412,18 +412,18 @@ This section describes the ordered steps to port the current single-purpose repo
 
 ### Phase 2: Populate the docs site
 
-8. **Port existing content** from README.md and codraft_mvp_spec.md into MDX pages:
+8. **Port existing content** from README.md and coquill_mvp_spec.md into MDX pages:
    - `getting-started.mdx` ← README quick start + install
    - `template-authoring.mdx` ← README template authoring + placeholders
    - `variable-naming.mdx` ← README naming conventions table
    - `project-structure.mdx` ← README + CLAUDE.md structure sections
-   - `mvp-scope.mdx` ← codraft_mvp_spec.md (summarised)
+   - `mvp-scope.mdx` ← coquill_mvp_spec.md (summarised)
 
 9. **Write new content:**
    - `index.mdx` — docs landing page (card grid linking to guides)
    - `nda-walkthrough.mdx` — end-to-end NDA example with screenshots
 
-10. **Design the landing page** — replace Plasma demo hero/features/CTA with Codraft content.
+10. **Design the landing page** — replace Plasma demo hero/features/CTA with CoQuill content.
 
 11. **Test local build** — `cd docs && npm run build` succeeds, all pages render.
 
@@ -452,7 +452,7 @@ This section describes the ordered steps to port the current single-purpose repo
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
 | Users still click "Download ZIP" instead of Releases | High | Medium — they get extra files | Add a prominent note at the top of README. Consider adding a `COWORK_USERS_READ_THIS.md` to the repo root. |
-| Docs framework (Astro) adds Node.js as a dev dependency | Low | Low — only affects docs contributors | Docs build is isolated in `docs/`. Core Codraft users never touch Node. |
+| Docs framework (Astro) adds Node.js as a dev dependency | Low | Low — only affects docs contributors | Docs build is isolated in `docs/`. Core CoQuill users never touch Node. |
 | Template purchase (Plasma, $79) is a sunk cost if it doesn't fit | Low | Low | The template is a starting point, not a lock-in. shadcn/ui components are standard React; everything is portable. |
 | Test harness needs access to rendering pipeline code | Medium | Medium — tight coupling | The harness should call the same Python functions the skill calls, imported from a shared location. If the skill is refactored later to extract a library, the harness imports shift but the scenarios stay the same. |
 | GitHub Pages deployment conflicts with existing repo settings | Low | Low | Use a dedicated `gh-pages` branch. This is the standard Astro deployment pattern and does not affect the main branch. |
@@ -463,7 +463,7 @@ This section describes the ordered steps to port the current single-purpose repo
 
 The following are explicitly not part of this migration:
 
-- Changing the Codraft skill logic or rendering pipeline.
+- Changing the CoQuill skill logic or rendering pipeline.
 - Adding new template features (conditionals, loops, computed fields).
 - Multi-agent automated testing (the scenario format supports it, but the automated harness is future work).
 - Custom domain setup for the docs site.
@@ -476,7 +476,7 @@ The following are explicitly not part of this migration:
 
 The migration is complete when:
 
-1. A tagged release produces a slim ZIP that contains only core Codraft files.
+1. A tagged release produces a slim ZIP that contains only core CoQuill files.
 2. That ZIP, when opened in Cowork, works identically to the current repo.
 3. The docs site is live on GitHub Pages with at least 5 content pages.
 4. The test suite has at least 3 passing scenarios covering simple substitution, multiple field types, and HTML rendering.

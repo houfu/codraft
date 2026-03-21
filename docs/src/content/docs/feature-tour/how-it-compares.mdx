@@ -1,15 +1,15 @@
 ---
-title: How Codraft Compares
-description: How Codraft differs from Docassemble, HotDocs, Gavel, and other document assembly tools
+title: How CoQuill Compares
+description: How CoQuill differs from Docassemble, HotDocs, Gavel, and other document assembly tools
 ---
 
 import { Aside } from '@astrojs/starlight/components';
 
-Traditional document assembly tools were built for IT departments and law firms with deployment budgets. Codraft is a different point on the trade-off curve: zero infrastructure, AI-generated interviews, standard template formats -- in exchange for less determinism and a dependency on Claude.
+Traditional document assembly tools were built for IT departments and law firms with deployment budgets. CoQuill is a different point on the trade-off curve: zero infrastructure, AI-generated interviews, standard template formats -- in exchange for less determinism and a dependency on Claude.
 
 ## At a glance
 
-|  | Codraft | [Docassemble](https://docassemble.org/) | [HotDocs](https://www.hotdocs.com/) | [Gavel](https://www.gavel.io/) | [Knackly](https://knackly.io/) |
+|  | CoQuill | [Docassemble](https://docassemble.org/) | [HotDocs](https://www.hotdocs.com/) | [Gavel](https://www.gavel.io/) | [Knackly](https://knackly.io/) |
 |---|---|---|---|---|---|
 | **Setup** | Download a zip or one CLI command | Linux server + Docker | Enterprise deployment | SaaS account | SaaS account |
 | **Interview style** | AI conversation | Guided form | Guided form | No-code form builder | Step-by-step form |
@@ -25,7 +25,7 @@ Traditional document assembly tools were built for IT departments and law firms 
 | **Pricing** | Free | Free + hosting costs | $25--99+/user/mo | Custom/enterprise | $209--834/mo |
 | **Requires Claude** | Yes | No | No | No | No |
 
-¹ Codraft has no built-in integrations of its own. Because it runs inside Claude, it can use any [MCP](https://modelcontextprotocol.io/) server configured in your Claude environment during the interview — giving it access to CRMs, databases, document stores, and other tools without any integration work on Codraft's part.
+¹ CoQuill has no built-in integrations of its own. Because it runs inside Claude, it can use any [MCP](https://modelcontextprotocol.io/) server configured in your Claude environment during the interview — giving it access to CRMs, databases, document stores, and other tools without any integration work on CoQuill's part.
 
 ² Every document assembly session saves a `transcript.md` (human-readable record of questions and answers) and `interview_log.json` (structured data) alongside the rendered output. This provides a per-document audit trail but not a centralised audit log across sessions.
 
@@ -37,7 +37,7 @@ Docassemble is the most capable open-source document assembly tool available. It
 
 The trade-off is infrastructure. Docassemble requires a Linux server running Docker, ongoing maintenance, and a developer to author the interview YAML separately from the template. It is two parallel projects: the template and the interview that drives it.
 
-Codraft drew direct inspiration from Docassemble. If you are building a production system for a legal aid organisation, government agency, or law school -- one that needs authenticated users, shared data, and guaranteed question order -- Docassemble is likely the right choice.
+CoQuill drew direct inspiration from Docassemble. If you are building a production system for a legal aid organisation, government agency, or law school -- one that needs authenticated users, shared data, and guaranteed question order -- Docassemble is likely the right choice.
 
 ### HotDocs
 
@@ -45,7 +45,7 @@ HotDocs is the established enterprise standard. It has deep Microsoft Word integ
 
 The trade-off is cost and lock-in. Per-user licensing adds up quickly, and templates are built with the HotDocs Author add-in in a proprietary format. Migrating away from HotDocs means rebuilding those templates.
 
-Codraft templates are standard Word files with plain Jinja2 placeholders. If you switch tools later, you keep your templates.
+CoQuill templates are standard Word files with plain Jinja2 placeholders. If you switch tools later, you keep your templates.
 
 ### Gavel (formerly Documate)
 
@@ -53,7 +53,7 @@ Gavel is a cloud SaaS platform with a no-code form builder. You upload a Word do
 
 Two things to keep in mind. First, the interview is a traditional web form -- not a conversation. Fixed questions, fixed order. Second, documents are processed on Gavel's servers. Document content, variable values, and templates are transmitted to and stored by the service.
 
-See the [Security and Privacy](/codraft/feature-tour/security/) page if data residency is a consideration.
+See the [Security and Privacy](/coquill/feature-tour/security/) page if data residency is a consideration.
 
 ### Knackly and Bryter
 
@@ -61,7 +61,7 @@ Both are SaaS platforms aimed at teams with budgets to match: Knackly starts at 
 
 Bryter has added generative AI workflow features, but interview generation from a template is not one of them. Worth evaluating for multi-user workflows, audit trails, and enterprise SSO requirements.
 
-## When Codraft fits
+## When CoQuill fits
 
 - Automating a handful of document types for personal or small-team use
 - Zero infrastructure -- no server, no SaaS account, no subscription
@@ -69,7 +69,7 @@ Bryter has added generative AI workflow features, but interview generation from 
 - Templates are Word or HTML files you want to keep in a portable format
 - An AI-conducted conversation (rather than a deterministic form) is acceptable
 
-## When Codraft is not the right fit
+## When CoQuill is not the right fit
 
 - Regulated intake forms requiring exact question order and wording
 - Building a system for end users who do not have Claude Cowork or Claude Code
@@ -78,5 +78,5 @@ Bryter has added generative AI workflow features, but interview generation from 
 - You need `{% elif %}`, nested blocks, or computed fields (not available yet)
 
 <Aside type="tip">
-  The [Limitations](/codraft/feature-tour/limitations/) page covers Codraft's specific technical and safety constraints in detail.
+  The [Limitations](/coquill/feature-tour/limitations/) page covers CoQuill's specific technical and safety constraints in detail.
 </Aside>

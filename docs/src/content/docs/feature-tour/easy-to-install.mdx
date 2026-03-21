@@ -5,7 +5,7 @@ description: No server, no database, no hosting — just download and go
 
 import { Aside } from '@astrojs/starlight/components';
 
-Codraft runs entirely inside Claude. There is no server to spin up, no database to configure, and nothing to host. You get document automation the moment you install it.
+CoQuill runs entirely inside Claude. There is no server to spin up, no database to configure, and nothing to host. You get document automation the moment you install it.
 
 <Aside type="note">
   Docassemble, the most capable open-source alternative, requires a Linux server running Docker and ongoing maintenance. HotDocs requires an enterprise deployment engagement before the first document can be produced.
@@ -15,12 +15,12 @@ Codraft runs entirely inside Claude. There is no server to spin up, no database 
 
 The canonical setup is Claude Cowork with the folder download -- no terminal, no configuration, and no plugin marketplace needed. Claude Code and compatible clients are also supported for users who prefer a terminal-based workflow.
 
-**Claude Cowork** -- Download the latest `codraft-v*.zip` from [GitHub Releases](https://github.com/houfu/codraft/releases), unzip it, and open the folder as a new Cowork project. Done.
+**Claude Cowork** -- Download the latest `coquill-v*.zip` from [GitHub Releases](https://github.com/houfu/coquill/releases), unzip it, and open the folder as a new Cowork project. Done.
 
 **Claude Code** -- Run a single command:
 
 ```bash
-/plugin marketplace add houfu/codraft
+/plugin marketplace add houfu/coquill
 ```
 
 That is the entire installation process.
@@ -35,17 +35,17 @@ Everything else happens inside the Claude conversation you already know how to u
 
 ## Dependencies handle themselves
 
-Codraft relies on a handful of Python packages -- `docxtpl`, `pyyaml`, `jinja2`, and `weasyprint`. You never need to install them manually. When a skill runs, it installs any missing packages automatically. After the initial install, everything is cached locally.
+CoQuill relies on a handful of Python packages -- `docxtpl`, `pyyaml`, `jinja2`, and `weasyprint`. You never need to install them manually. When a skill runs, it installs any missing packages automatically. After the initial install, everything is cached locally.
 
 ## No separate app
 
-There is no standalone application, no Electron window, no browser tab to keep open. Codraft lives where Claude already lives. You interact with it through the same conversation interface you use for everything else in Claude Cowork or Claude Code.
+There is no standalone application, no Electron window, no browser tab to keep open. CoQuill lives where Claude already lives. You interact with it through the same conversation interface you use for everything else in Claude Cowork or Claude Code.
 
-That means zero context-switching. Ask Claude to prepare a document with Codraft, answer a few questions, and the finished file appears in your `output/` folder -- all without leaving the chat.
+That means zero context-switching. Ask Claude to prepare a document with CoQuill, answer a few questions, and the finished file appears in your `output/` folder -- all without leaving the chat.
 
 ## Share it with a colleague
 
-Because Codraft is just a folder, it is completely portable. If you have built a set of templates for your own work, sharing them is as simple as zipping up the folder and sending it over. Your colleague opens it as a Cowork project on their own machine and can use the same templates to produce the same documents.
+Because CoQuill is just a folder, it is completely portable. If you have built a set of templates for your own work, sharing them is as simple as zipping up the folder and sending it over. Your colleague opens it as a Cowork project on their own machine and can use the same templates to produce the same documents.
 
 No deployment, no shared server, no access management. The whole setup travels in a zip file.
 
@@ -53,4 +53,4 @@ No deployment, no shared server, no access management. The whole setup travels i
 
 Templates are local files, rendering happens on your machine, and output stays on your disk. No cloud uploads, no waiting for a remote server to respond.
 
-Codraft requires an active Claude session -- but your documents never leave your machine.
+CoQuill requires an active Claude session -- but your documents never leave your machine.
