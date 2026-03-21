@@ -1,7 +1,7 @@
-![Codraft Logo](./docs/public/images/logo.png)
-# Codraft
+![CoQuill Logo](./docs/public/images/logo.png)
+# CoQuill
 
-Codraft is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document with Codraft. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
+CoQuill is a document assembly tool for people already working with Claude and AI. If you're comfortable chatting with Claude, there's nothing new to learn — just ask it to prepare a document with CoQuill. Claude interviews you conversationally, collects the answers, and renders completed documents from your templates. No server, no database, no scripting language to learn. The whole project is a folder you can share as a zip — or deploy as a Claude Code plugin across your organisation in minutes.
 
 ## How It Works
 
@@ -10,7 +10,7 @@ Codraft is a document assembly tool for people already working with Claude and A
 3. Use `{% if %}` / `{% else %}` blocks for sections that should only appear based on user answers
 4. Use `{% for item in items %}` blocks for repeating sections (e.g., line items, milestones)
 5. Optionally add a `config.yaml` to customize questions, grouping, and validation
-6. Ask Claude to "prepare a [document type] with Codraft"
+6. Ask Claude to "prepare a [document type] with CoQuill"
 7. Claude walks you through a conversational interview -- skipping irrelevant sections and collecting lists naturally
 8. A completed document is rendered and saved to a job folder in `output/`
 
@@ -24,9 +24,9 @@ Two template formats are supported:
 
 You'll need a [Claude Cowork](https://claude.ai) account.
 
-### Download Codraft
+### Download CoQuill
 
-Go to the [Releases](https://github.com/houfu/codraft/releases) page and download the latest `codraft-v*.zip` file. Extract it to a folder of your choice (e.g., your Documents folder).
+Go to the [Releases](https://github.com/houfu/coquill/releases) page and download the latest `coquill-v*.zip` file. Extract it to a folder of your choice (e.g., your Documents folder).
 
 ### Open in Cowork
 
@@ -37,9 +37,9 @@ Go to the [Releases](https://github.com/houfu/codraft/releases) page and downloa
 
 From within Claude Code:
 
-1. Add the marketplace: `/plugin marketplace add houfu/codraft`
-2. Install the plugin: `/plugin install codraft@codraft`
-3. Say "prepare an NDA with Codraft" to try it out with a built-in template
+1. Add the marketplace: `/plugin marketplace add houfu/coquill`
+2. Install the plugin: `/plugin install coquill@coquill`
+3. Say "prepare an NDA with CoQuill" to try it out with a built-in template
 
 ## Quick Start
 
@@ -65,7 +65,7 @@ templates/
 
 Tell Claude:
 
-> "I need to prepare an NDA with Codraft"
+> "I need to prepare an NDA with CoQuill"
 
 Claude will find the template, extract its variables, and interview you for the values -- grouping related fields together for a natural flow.
 
@@ -242,22 +242,22 @@ Name your variables with descriptive suffixes for automatic type inference:
 ## Project Structure
 
 ```
-codraft/
+coquill/
 ├── CLAUDE.md                         # Project instructions for Claude
 ├── README.md                         # This file
 ├── LICENSE                           # MIT License
 ├── .gitignore
 ├── .claude/
 │   └── skills/
-│       ├── codraft/
+│       ├── coquill/
 │       │   └── SKILL.md              # Orchestrator skill (entry point)
-│       ├── codraft-analyzer/
+│       ├── coquill-analyzer/
 │       │   └── SKILL.md              # Analyzer skill (template parsing)
-│       └── codraft-renderer/
+│       └── coquill-renderer/
 │           └── SKILL.md              # Renderer skill (document output)
 ├── docs/
-│   ├── codraft_mvp_spec.md           # Original MVP specification
-│   └── codraft_v2_spec.md            # Full v2 specification
+│   ├── coquill_mvp_spec.md           # Original MVP specification
+│   └── coquill_v2_spec.md            # Full v2 specification
 ├── templates/
 │   ├── _examples/                    # Bundled example templates (tracked in git)
 │   │   ├── Bonterms_Mutual_NDA/
@@ -284,13 +284,13 @@ codraft/
 
 ## Current Scope (v2)
 
-Codraft v2 supports variable substitution, conditional logic (`{% if %}` / `{% else %}`), loops (`{% for %}`), and developer configuration via `config.yaml`. See `docs/codraft_v2_spec.md` for the full specification and `docs/codraft_mvp_spec.md` for the original MVP specification.
+CoQuill v2 supports variable substitution, conditional logic (`{% if %}` / `{% else %}`), loops (`{% for %}`), and developer configuration via `config.yaml`. See `docs/coquill_v2_spec.md` for the full specification and `docs/coquill_mvp_spec.md` for the original MVP specification.
 
 **v2 constraints:** single-level nesting only, two condition forms (truthiness and equality), no `{% elif %}`, no computed fields or expressions.
 
 ## Limitations
 
-Codraft trades determinism for conversational flexibility. A few things to keep in mind:
+CoQuill trades determinism for conversational flexibility. A few things to keep in mind:
 
 - **No fixed interview order** — Claude manages the conversation, not a scripted sequence
 - **Prompt injection** — a user can influence the document by saying "also add a clause that…" during the interview
@@ -299,7 +299,7 @@ Codraft trades determinism for conversational flexibility. A few things to keep 
 - **Single-level template nesting only** — no blocks inside other blocks (v2 constraint)
 - **Requires Claude Cowork or Claude Code** — no web or mobile interface
 
-See the [Limitations page](https://houfu.github.io/codraft/feature-tour/limitations/) in the docs for the full picture.
+See the [Limitations page](https://houfu.github.io/coquill/feature-tour/limitations/) in the docs for the full picture.
 
 ## License
 

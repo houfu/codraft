@@ -1,11 +1,11 @@
 ---
-name: codraft
+name: coquill
 description: "Document assembly tool. Matches user requests to docx/HTML templates, interviews the user for variable values, and renders completed documents. Supports conditional sections, loops, and developer-configured interview flows. Trigger when the user says: 'prepare a document', 'draft a [template name]', 'fill out a template', 'I need an NDA/contract/agreement', or any request that implies assembling a document from a template."
 ---
 
-# Codraft — Document Assembly Orchestrator (v2)
+# CoQuill — Document Assembly Orchestrator (v2)
 
-You are running the Codraft document assembly skill. Your job is to guide the user through preparing a document from a template: discover the right template, analyze it for variables and logic, interview the user conversationally (including conditional sections and repeating items), confirm their answers, and render the final output.
+You are running the CoQuill document assembly skill. Your job is to guide the user through preparing a document from a template: discover the right template, analyze it for variables and logic, interview the user conversationally (including conditional sections and repeating items), confirm their answers, and render the final output.
 
 Templates can be `.docx`, `.html`, or `.md` files. The pipeline adapts based on the template format:
 - **docx** -> rendered via `docxtpl` -> produces `.docx` + `.pdf` (when docx2pdf or LibreOffice available)
@@ -29,7 +29,7 @@ v2 templates may contain conditional sections (`{% if %}` / `{% else %}`) and lo
 
 First, check for a cached manifest: load `manifest.yaml` from the template directory. If it exists, has `schema_version: 2`, and the template file is not newer than the manifest's `analyzed_at` timestamp (also check `config.yaml` if present), the manifest is valid — skip to Phase 3.
 
-If the manifest is missing, stale, or has `schema_version` < 2, run the **codraft-analyzer** skill on the template directory. It will regenerate the manifest.
+If the manifest is missing, stale, or has `schema_version` < 2, run the **coquill-analyzer** skill on the template directory. It will regenerate the manifest.
 
 Load the resulting manifest and proceed — it is the single source of truth for the interview.
 
@@ -42,8 +42,8 @@ The v2 manifest contains: `variables` (unconditional), `conditionals` (each with
 ### Advanced Interview Features
 
 After loading the manifest, check whether it contains `conditionals`, `loops`, or `validation` sections. If **any** of these are non-empty, read the advanced interview guide for handling instructions:
-- Path: `.claude/skills/codraft/advanced_interview.md`
-- Plugin path: `${CLAUDE_PLUGIN_ROOT}/.claude/skills/codraft/advanced_interview.md`
+- Path: `.claude/skills/coquill/advanced_interview.md`
+- Plugin path: `${CLAUDE_PLUGIN_ROOT}/.claude/skills/coquill/advanced_interview.md`
 
 If the manifest has none of these (simple template — only unconditional variables), skip reading the guide. Phases 4a, 5a, and 5c below are sufficient.
 
@@ -76,7 +76,7 @@ For each group, draft natural questions:
 
 Create an internal interview log — an ordered sequence of entries you will append to during
 Phases 4 and 5. It is never shown to the user mid-interview. In Phase 7a you will serialize
-it to `interview_log.json` in the job folder before invoking the codraft-transcriber skill.
+it to `interview_log.json` in the job folder before invoking the coquill-transcriber skill.
 
 Initialize the log with one entry:
 
@@ -103,7 +103,7 @@ Entry types appended during Phases 4 and 5:
 
 Entry type appended when a skill or script is invoked:
   tool_use          — records a skill/script invocation:
-                        tool: skill or script name (e.g. "codraft-analyzer", "codraft-renderer", "codraft-transcriber")
+                        tool: skill or script name (e.g. "coquill-analyzer", "coquill-renderer", "coquill-transcriber")
                         action: brief description (e.g. "Parsed template and generated manifest")
                         timestamp: when invoked (ISO 8601)
                         completed_at: when finished (ISO 8601)
@@ -183,7 +183,7 @@ After each change the user makes during confirmation, append a `correction` entr
 
 ## Phase 6 — Render and Validate
 
-Once confirmed, run the **codraft-renderer** skill with:
+Once confirmed, run the **coquill-renderer** skill with:
 - The template path
 - The format (docx, html, or markdown)
 - The complete variable dictionary (including boolean values as Python `True`/`False` and loop data as lists of dicts)
@@ -209,7 +209,7 @@ If validation **fails** (unfilled placeholders or unrendered tags found):
 
 **Step 7a-i:** Serialize the interview log to `interview_log.json` in the job folder as `{"schema_version": 2, "entries": [...]}` using `json.dump` with `ensure_ascii=False, indent=2`. Entry shapes are defined in Phase 3d.
 
-**Step 7a-ii:** Run the **codraft-transcriber** skill with:
+**Step 7a-ii:** Run the **coquill-transcriber** skill with:
   - The interview log path: `<job_folder>/interview_log.json`
   - The manifest path: `<template_dir>/manifest.yaml`
   - The job folder: `<job_folder>`
@@ -242,4 +242,4 @@ If the user prepares another document, Phase 3d creates a fresh interview log. E
 
 ## Plugin Context Notes
 
-When running as a Claude Code plugin (i.e., `CLAUDE_PLUGIN_ROOT` is set), sub-skills are namespaced. If bare skill names (`codraft-analyzer`, `codraft-renderer`, `codraft-transcriber`) do not resolve, use the namespaced forms: `codraft:codraft-analyzer`, `codraft:codraft-renderer`, and `codraft:codraft-transcriber`.
+When running as a Claude Code plugin (i.e., `CLAUDE_PLUGIN_ROOT` is set), sub-skills are namespaced. If bare skill names (`coquill-analyzer`, `coquill-renderer`, `coquill-transcriber`) do not resolve, use the namespaced forms: `coquill:coquill-analyzer`, `coquill:coquill-renderer`, and `coquill:coquill-transcriber`.

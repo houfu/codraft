@@ -1,15 +1,15 @@
 ---
-name: codraft-renderer
-description: "Document renderer for Codraft. Takes a template, variable values, and produces rendered documents (docx or html+pdf). Validates output for unfilled placeholders. Called by the codraft orchestrator — not triggered directly by the user."
+name: coquill-renderer
+description: "Document renderer for CoQuill. Takes a template, variable values, and produces rendered documents (docx or html+pdf). Validates output for unfilled placeholders. Called by the coquill orchestrator — not triggered directly by the user."
 ---
 
-# Codraft — Document Renderer (v2)
+# CoQuill — Document Renderer (v2)
 
-You are running the Codraft document renderer. Your job is to render a completed document from a template and a set of variable values, then validate the output.
+You are running the CoQuill document renderer. Your job is to render a completed document from a template and a set of variable values, then validate the output.
 
 ## Inputs
 
-This skill is called by the Codraft orchestrator. You receive:
+This skill is called by the CoQuill orchestrator. You receive:
 - **Template path** — e.g., `templates/_examples/Bonterms_Mutual_NDA/Bonterms-Mutual-NDA.docx`
 - **Format** — `docx`, `html`, or `markdown`
 - **Variable dictionary** — all collected values: flat key-value pairs, booleans as Python `True`/`False`, and loop collections as lists of dicts

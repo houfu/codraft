@@ -1,4 +1,4 @@
-"""Output comparison utilities for Codraft test harness."""
+"""Output comparison utilities for CoQuill test harness."""
 
 from pathlib import Path
 

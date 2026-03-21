@@ -1,6 +1,6 @@
 ---
 title: "Install: Claude Cowork"
-description: Add Codraft to Claude Cowork using the folder method or plugin marketplace
+description: Add CoQuill to Claude Cowork using the folder method or plugin marketplace
 ---
 
 import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
@@ -22,7 +22,7 @@ Download the latest release and open it as a Cowork project.
 
    Download the latest release directly:
 
-   **[⬇ Download codraft-latest.zip](https://github.com/houfu/codraft/releases/latest/download/codraft-latest.zip)**
+   **[⬇ Download coquill-latest.zip](https://github.com/houfu/coquill/releases/latest/download/coquill-latest.zip)**
 
 2. **Extract the archive**
 
@@ -30,13 +30,13 @@ Download the latest release and open it as a Cowork project.
 
 3. **Open the folder in Cowork**
 
-   In Claude Cowork, create a new project. When prompted for a project folder, select the extracted `codraft/` directory.
+   In Claude Cowork, create a new project. When prompted for a project folder, select the extracted `coquill/` directory.
 
-   Cowork loads `CLAUDE.md` as project context and makes the Codraft skills available automatically.
+   Cowork loads `CLAUDE.md` as project context and makes the CoQuill skills available automatically.
 
 4. **Verify the install**
 
-   Tell Claude: *"Prepare a mutual NDA with Codraft"*
+   Tell Claude: *"Prepare a mutual NDA with CoQuill"*
 
    Claude should find the bundled Bonterms Mutual NDA template and start the interview.
 
@@ -57,13 +57,13 @@ Install directly from the Cowork Plugin Marketplace.
 
    In Claude Cowork, navigate to the Plugin Marketplace.
 
-2. **Search for Codraft**
+2. **Search for CoQuill**
 
-   Search for `houfu/codraft` and click **Install**.
+   Search for `houfu/coquill` and click **Install**.
 
 3. **Verify the install**
 
-   Tell Claude: *"Prepare a mutual NDA with Codraft"*
+   Tell Claude: *"Prepare a mutual NDA with CoQuill"*
 
    Claude should find the bundled Bonterms Mutual NDA template and start the interview.
 
@@ -73,10 +73,10 @@ Install directly from the Cowork Plugin Marketplace.
 </Tabs>
 
 <Aside type="tip">
-When Codraft runs, Claude installs any missing Python packages (`docxtpl`, `pyyaml`, `jinja2`, `weasyprint`) automatically. The first install takes about 30 seconds; after that, packages are cached locally.
+When CoQuill runs, Claude installs any missing Python packages (`docxtpl`, `pyyaml`, `jinja2`, `weasyprint`) automatically. The first install takes about 30 seconds; after that, packages are cached locally.
 </Aside>
 
 ## Next steps
 
-- [Quickstart](/codraft/start-here/quickstart/) -- prepare your first document in under five minutes
-- [Feature Tour](/codraft/feature-tour/easy-to-install/) -- see what Codraft can do
+- [Quickstart](/coquill/start-here/quickstart/) -- prepare your first document in under five minutes
+- [Feature Tour](/coquill/feature-tour/easy-to-install/) -- see what CoQuill can do

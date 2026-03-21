@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Prepare your first document with Codraft in under five minutes using the bundled Bonterms Mutual NDA
+description: Prepare your first document with CoQuill in under five minutes using the bundled Bonterms Mutual NDA
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
@@ -8,7 +8,7 @@ import { Steps, Aside } from '@astrojs/starlight/components';
 This guide walks you through preparing the bundled **Bonterms Mutual NDA** using Claude Cowork. You will go from zero to a completed Word document in under five minutes.
 
 <Aside>
-Codraft ships with the [Bonterms Mutual NDA](https://bonterms.com/download-center/mutual-nda) as an example template. It is a real, production-quality mutual NDA released under CC BY 4.0.
+CoQuill ships with the [Bonterms Mutual NDA](https://bonterms.com/download-center/mutual-nda) as an example template. It is a real, production-quality mutual NDA released under CC BY 4.0.
 </Aside>
 
 ## Get a Claude account and download the Desktop app
@@ -24,15 +24,15 @@ Skip this step if you already have a Claude Pro or Max account and downloaded th
 
 </Steps>
 
-## Download the latest Codraft Folder
+## Download the latest CoQuill Folder
 
-  There are several ways to use Codraft. For this quickstart, download the latest release:
+  There are several ways to use CoQuill. For this quickstart, download the latest release:
 
-  **[⬇ Download codraft-latest.zip](https://github.com/houfu/codraft/releases/latest/download/codraft-latest.zip)**
+  **[⬇ Download coquill-latest.zip](https://github.com/houfu/coquill/releases/latest/download/coquill-latest.zip)**
 
   Extract the contents to a place where you can find it (Downloads or Documents).
 
-![Screenshot showing the release folder](/codraft/images/quickstarts/highlight_release_folder.png)
+![Screenshot showing the release folder](/coquill/images/quickstarts/highlight_release_folder.png)
 
 <Aside>
   **Don't download the plugin file.** The plugin is used for Claude Code and other plugin marketplaces.
@@ -42,17 +42,17 @@ Skip this step if you already have a Claude Pro or Max account and downloaded th
 
 <Steps>
 
-1. **Open Claude Cowork and use your Codraft folder**
+1. **Open Claude Cowork and use your CoQuill folder**
 
     Open the Claude Desktop App and switch to the Cowork Tab (Cmd+2 on Mac). Work in the Cowork folder you just downloaded by selecting it in the dropdown box.
 
     Type a natural request:
 
     ```
-    Prepare a mutual NDA with Codraft.
+    Prepare a mutual NDA with CoQuill.
     ```
 
-    ![Screenshot showing the Cowork screen with the Codraft folder selected, and a prompt "Prepare a mutual NDA with Codraft" is entered.](/codraft/images/quickstarts/Codraft-start.png)
+    ![Screenshot showing the Cowork screen with the CoQuill folder selected, and a prompt "Prepare a mutual NDA with CoQuill" is entered.](/coquill/images/quickstarts/CoQuill-start.png)
 
 2. **Claude prepares the NDA**
 
@@ -62,7 +62,7 @@ Skip this step if you already have a Claude Pro or Max account and downloaded th
 </Steps>
 
 <Aside>
-The first time you run Codraft on a template, Claude is running code to analyse the template in detecting variables and generating questions. This file is saved in the template folder, speeding up future runs (at least until the next time you adjust the template.)
+The first time you run CoQuill on a template, Claude is running code to analyse the template in detecting variables and generating questions. This file is saved in the template folder, speeding up future runs (at least until the next time you adjust the template.)
 </Aside>
 
 <Steps>  
@@ -148,12 +148,12 @@ The first time you run Codraft on a template, Claude is running code to analyse 
 
    Open the `.docx` file in Word, Google Docs, or any compatible application to review the final document. The `transcript.md` records the full interview — questions, answers, and confirmed values — so you can review what was discussed without scrolling through the chat.
 
-     ![Screenshot showing the Cowork screen with the a pane on the right showing the rendered contract.](/codraft/images/quickstarts/Quickstart-results.png)
+     ![Screenshot showing the Cowork screen with the a pane on the right showing the rendered contract.](/coquill/images/quickstarts/Quickstart-results.png)
 </Steps>
 
 ## What just happened
 
-Behind the scenes, Codraft ran four steps:
+Behind the scenes, CoQuill ran four steps:
 
 1. **Discovery** -- Claude matched "mutual NDA" to the `Bonterms_Mutual_NDA` template directory
 2. **Analysis** -- The Analyzer skill parsed the `.docx` template, extracted all 13 variables, and produced a `manifest.yaml`
@@ -162,4 +162,4 @@ Behind the scenes, Codraft ran four steps:
 
 ## Ready to explore more?
 
-[Feature Tour](/codraft/feature-tour/easy-to-install/) -- see all of Codraft's features at a glance.
+[Feature Tour](/coquill/feature-tour/easy-to-install/) -- see all of CoQuill's features at a glance.

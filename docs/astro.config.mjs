@@ -2,18 +2,18 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-  site: 'https://houfu.github.io/codraft',
-  base: '/codraft',
+  site: 'https://houfu.github.io/coquill',
+  base: '/coquill',
   integrations: [
     starlight({
-      title: 'Codraft',
+      title: 'CoQuill',
       description: 'Document assembly tool for Claude Cowork',
       logo: {
         src: './src/assets/logo.svg',
         replacesTitle: false,
       },
       social: [
-        { icon: 'github', label: 'GitHub', href: 'https://github.com/houfu/codraft' },
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/houfu/coquill' },
       ],
       favicon: '/favicon.svg',
       head: [
@@ -49,7 +49,7 @@ export default defineConfig({
             { label: "It's Just a Conversation", slug: 'feature-tour/natural-conversation' },
             { label: 'Quick Rendering', slug: 'feature-tour/quick-rendering' },
             { label: 'Security and Privacy', slug: 'feature-tour/security' },
-            { label: 'How Codraft Compares', slug: 'feature-tour/how-it-compares' },
+            { label: 'How CoQuill Compares', slug: 'feature-tour/how-it-compares' },
             { label: 'Limitations', slug: 'feature-tour/limitations' },
           ],
         },

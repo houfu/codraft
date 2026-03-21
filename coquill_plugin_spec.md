@@ -1,18 +1,18 @@
-# Codraft — Claude Code Plugin Distribution Specification
+# CoQuill — Claude Code Plugin Distribution Specification
 
 **Version:** 0.1
 **Date:** 2026-02-21
-**Extends:** `codraft_v2_spec.md` (v0.2)
+**Extends:** `coquill_v2_spec.md` (v0.2)
 
 ---
 
 ## 1. Overview
 
-This specification adds Claude Code plugin distribution to Codraft. Currently, Codraft is distributed as a zip file for Claude Cowork users. This spec introduces a second distribution channel via the Claude Code plugin marketplace, built from the same source SKILL.md files.
+This specification adds Claude Code plugin distribution to CoQuill. Currently, CoQuill is distributed as a zip file for Claude Cowork users. This spec introduces a second distribution channel via the Claude Code plugin marketplace, built from the same source SKILL.md files.
 
 ### 1.1 Goals
 
-- **Plugin distribution** — Claude Code users can install Codraft via `/plugin marketplace add` and `/plugin install` without downloading a zip
+- **Plugin distribution** — Claude Code users can install CoQuill via `/plugin marketplace add` and `/plugin install` without downloading a zip
 - **Cowork-at-root** — The existing Cowork project structure (`.claude/skills/`) remains the source of truth; the plugin is a derived artifact
 - **Bundled example templates** — The plugin ships with `templates/_examples/` so users get a working demo immediately after install
 - **Dual-environment dependencies** — Dependency installation works in both Claude Code (which has `uv`) and Cowork (which only has `pip`)
@@ -33,14 +33,14 @@ This specification adds Claude Code plugin distribution to Codraft. Currently, C
 The repo root continues to use the Cowork layout. The Claude Code plugin is assembled at release time by copying skills and templates into a plugin directory structure.
 
 ```
-codraft/                              # Repo root = Cowork project
+coquill/                              # Repo root = Cowork project
 ├── .claude/
 │   └── skills/                       # SOURCE OF TRUTH
-│       ├── codraft/
+│       ├── coquill/
 │       │   └── SKILL.md
-│       ├── codraft-analyzer/
+│       ├── coquill-analyzer/
 │       │   └── SKILL.md
-│       └── codraft-renderer/
+│       └── coquill-renderer/
 │           └── SKILL.md
 ├── plugin/                           # Plugin metadata (checked in)
 │   ├── .claude-plugin/
@@ -58,15 +58,15 @@ codraft/                              # Repo root = Cowork project
 The GitHub Action assembles this structure into a release artifact:
 
 ```
-codraft-plugin/
+coquill-plugin/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── skills/
-│   ├── codraft/
+│   ├── coquill/
 │   │   └── SKILL.md
-│   ├── codraft-analyzer/
+│   ├── coquill-analyzer/
 │   │   └── SKILL.md
-│   └── codraft-renderer/
+│   └── coquill-renderer/
 │       └── SKILL.md
 ├── templates/
 │   └── _examples/
@@ -85,8 +85,8 @@ codraft-plugin/
 The repo itself serves as the marketplace. Users add the repo directly:
 
 ```
-/plugin marketplace add houfu/codraft
-/plugin install codraft@codraft
+/plugin marketplace add houfu/coquill
+/plugin install coquill@coquill
 ```
 
 This is achieved by placing `.claude-plugin/marketplace.json` at the repo root, pointing to the plugin source within the same repo.
@@ -101,7 +101,7 @@ Static metadata file, checked into git. The version field is overwritten by the 
 
 ```json
 {
-  "name": "codraft",
+  "name": "coquill",
   "description": "Document assembly tool. Interview users and render completed documents from docx/HTML templates with conditional logic, loops, and developer configuration.",
   "version": "0.0.0",
   "author": {
@@ -116,13 +116,13 @@ Marketplace manifest at the repo root. Points to the plugin source within the sa
 
 ```json
 {
-  "name": "codraft",
+  "name": "coquill",
   "owner": {
     "name": "houfu"
   },
   "plugins": [
     {
-      "name": "codraft",
+      "name": "coquill",
       "source": "./plugin",
       "description": "Document assembly tool with conditional logic, loops, and developer configuration."
     }
@@ -130,12 +130,12 @@ Marketplace manifest at the repo root. Points to the plugin source within the sa
 }
 ```
 
-**Note:** The `source` field uses a relative path (`./plugin`). This works for local development and testing. For marketplace distribution via GitHub, the source may need to reference the repo directly — verify during testing whether `./plugin` resolves correctly when the marketplace is added via `houfu/codraft`. If not, switch to:
+**Note:** The `source` field uses a relative path (`./plugin`). This works for local development and testing. For marketplace distribution via GitHub, the source may need to reference the repo directly — verify during testing whether `./plugin` resolves correctly when the marketplace is added via `houfu/coquill`. If not, switch to:
 
 ```json
 "source": {
   "source": "github",
-  "repo": "houfu/codraft",
+  "repo": "houfu/coquill",
   "path": "plugin"
 }
 ```
@@ -189,16 +189,16 @@ No change. Output always goes to `output/` in the current working directory, reg
 
 ### 4.4 Skill Namespacing
 
-When installed as a plugin, skills are namespaced as `codraft:codraft`, `codraft:codraft-analyzer`, `codraft:codraft-renderer`.
+When installed as a plugin, skills are namespaced as `coquill:coquill`, `coquill:coquill-analyzer`, `coquill:coquill-renderer`.
 
-**Change:** Update the Orchestrator's instructions where it references the Analyzer and Renderer skills. Currently the Orchestrator says things like "Run the codraft-analyzer skill". Update to handle both forms:
+**Change:** Update the Orchestrator's instructions where it references the Analyzer and Renderer skills. Currently the Orchestrator says things like "Run the coquill-analyzer skill". Update to handle both forms:
 
-- In plugin context: `codraft:codraft-analyzer`
-- In Cowork context: `codraft-analyzer`
+- In plugin context: `coquill:coquill-analyzer`
+- In Cowork context: `coquill-analyzer`
 
-**Approach:** The Orchestrator should reference the sub-skills by their bare name (`codraft-analyzer`, `codraft-renderer`). Test during development whether Claude resolves these correctly in the plugin context. If not, add a note in the Orchestrator instructions:
+**Approach:** The Orchestrator should reference the sub-skills by their bare name (`coquill-analyzer`, `coquill-renderer`). Test during development whether Claude resolves these correctly in the plugin context. If not, add a note in the Orchestrator instructions:
 
-> "If running as a plugin, these skills are namespaced: use `codraft:codraft-analyzer` and `codraft:codraft-renderer`."
+> "If running as a plugin, these skills are namespaced: use `coquill:coquill-analyzer` and `coquill:coquill-renderer`."
 
 ---
 
@@ -211,7 +211,7 @@ The existing release workflow builds a Cowork zip from `release-manifest.txt`. E
 **New steps added after the existing zip build:**
 
 1. **Assemble plugin directory:**
-   - Copy `.claude/skills/codraft/`, `.claude/skills/codraft-analyzer/`, `.claude/skills/codraft-renderer/` → `build/plugin/skills/`
+   - Copy `.claude/skills/coquill/`, `.claude/skills/coquill-analyzer/`, `.claude/skills/coquill-renderer/` → `build/plugin/skills/`
    - Copy `templates/_examples/` → `build/plugin/templates/_examples/`
    - Copy `plugin/.claude-plugin/plugin.json` → `build/plugin/.claude-plugin/plugin.json`
    - Copy `plugin/README.md` → `build/plugin/README.md`
@@ -221,12 +221,12 @@ The existing release workflow builds a Cowork zip from `release-manifest.txt`. E
    - Replace the `"version"` field in `build/plugin/.claude-plugin/plugin.json`
 
 3. **Package plugin zip:**
-   - Zip `build/plugin/` as `codraft-plugin-v${VERSION}.zip`
+   - Zip `build/plugin/` as `coquill-plugin-v${VERSION}.zip`
 
 4. **Attach to release:**
    - The GitHub Release now has two artifacts:
-     - `codraft-v${VERSION}.zip` (Cowork)
-     - `codraft-plugin-v${VERSION}.zip` (Claude Code)
+     - `coquill-v${VERSION}.zip` (Cowork)
+     - `coquill-plugin-v${VERSION}.zip` (Claude Code)
 
 ### 5.2 `build/` Directory
 
@@ -258,8 +258,8 @@ Add a "Claude Code Installation" section alongside the existing Cowork installat
 
 From within Claude Code:
 
-1. Add the marketplace: `/plugin marketplace add houfu/codraft`
-2. Install the plugin: `/plugin install codraft@codraft`
+1. Add the marketplace: `/plugin marketplace add houfu/coquill`
+2. Install the plugin: `/plugin install coquill@coquill`
 3. Say "prepare an NDA" to try it out with a built-in template
 ```
 
@@ -276,7 +276,7 @@ Add a section noting the dual distribution:
 
 Plugin-specific README covering:
 
-- What Codraft does (brief)
+- What CoQuill does (brief)
 - Install instructions for Claude Code
 - How to add your own templates (create `templates/` in your project directory)
 - Link to the full README for template authoring docs
@@ -289,10 +289,10 @@ Plugin-specific README covering:
 
 1. Assemble the plugin directory manually (or with a local script)
 2. Start Claude Code in a test directory
-3. Add the local marketplace: `/plugin marketplace add ./path/to/codraft`
-4. Install: `/plugin install codraft@codraft`
+3. Add the local marketplace: `/plugin marketplace add ./path/to/coquill`
+4. Install: `/plugin install coquill@coquill`
 5. Verify:
-   - `/codraft` or "prepare an NDA" triggers the orchestrator
+   - `/coquill` or "prepare an NDA" triggers the orchestrator
    - Bundled templates are discovered from `${CLAUDE_PLUGIN_ROOT}/templates/_examples/`
    - Dependencies install via `uv` (or `pip` if `uv` is absent)
    - Output renders to `./output/` in the test directory
@@ -317,7 +317,7 @@ Plugin-specific README covering:
 
 1. Push a test tag (e.g., `v2.1.0-rc1`)
 2. Verify the release has both zip artifacts
-3. Download `codraft-plugin-v*.zip` and verify its structure matches section 2.2
+3. Download `coquill-plugin-v*.zip` and verify its structure matches section 2.2
 4. Verify `plugin.json` has the correct version
 
 ---
@@ -340,9 +340,9 @@ None. This is purely additive. Existing Cowork users are unaffected.
 
 | File | Change |
 |---|---|
-| `.claude/skills/codraft/SKILL.md` | Template discovery (dual-path), dependency install fallback, namespace note |
-| `.claude/skills/codraft-analyzer/SKILL.md` | Dependency install fallback |
-| `.claude/skills/codraft-renderer/SKILL.md` | Dependency install fallback |
+| `.claude/skills/coquill/SKILL.md` | Template discovery (dual-path), dependency install fallback, namespace note |
+| `.claude/skills/coquill-analyzer/SKILL.md` | Dependency install fallback |
+| `.claude/skills/coquill-renderer/SKILL.md` | Dependency install fallback |
 | `.github/workflows/release.yml` | Add plugin build and packaging steps |
 | `.gitignore` | Add `build/` |
 | `README.md` | Add Claude Code install instructions |

@@ -8,7 +8,7 @@ import { Aside } from '@astrojs/starlight/components';
 The `config.yaml` file is an optional configuration placed alongside your template. It controls the interview experience without modifying the template itself. The Analyzer merges it into the manifest; the Orchestrator reads only the manifest.
 
 <Aside>
-All sections are optional. You only need to include the fields you want to customize. For a practical guide with examples, see [Configuring with config.yaml](/codraft/guides/config-yaml/).
+All sections are optional. You only need to include the fields you want to customize. For a practical guide with examples, see [Configuring with config.yaml](/coquill/guides/config-yaml/).
 </Aside>
 
 ## Complete example
@@ -98,7 +98,7 @@ The `type` field accepts the following values:
 | `boolean` | A yes/no question. Used as the gate for `{% if %}` conditional sections. |
 | `choice` | One of a fixed set of options. Requires the `choices` field. |
 
-If `type` is omitted, it is inferred from the variable name suffix (e.g., `*_date` becomes `date`, `*_email` becomes `email`). See [Variable Type Reference](/codraft/reference/variable-types/) for the full inference table.
+If `type` is omitted, it is inferred from the variable name suffix (e.g., `*_date` becomes `date`, `*_email` becomes `email`). See [Variable Type Reference](/coquill/reference/variable-types/) for the full inference table.
 
 ### Example
 

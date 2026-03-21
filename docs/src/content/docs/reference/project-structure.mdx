@@ -1,23 +1,23 @@
 ---
 title: Project Structure
-description: How Codraft is organised on disk
+description: How CoQuill is organised on disk
 ---
 
 ```
-codraft/
+coquill/
 ├── CLAUDE.md                         # Project instructions for Claude
 ├── README.md                         # Project overview + install guide
 ├── LICENSE                           # MIT License
 ├── .gitignore
 ├── .claude/
 │   └── skills/
-│       ├── codraft/
+│       ├── coquill/
 │       │   └── SKILL.md              # Orchestrator skill (entry point)
-│       ├── codraft-analyzer/
+│       ├── coquill-analyzer/
 │       │   └── SKILL.md              # Analyzer skill (template parsing)
-│       ├── codraft-renderer/
+│       ├── coquill-renderer/
 │       │   └── SKILL.md              # Renderer skill (document output)
-│       └── codraft-transcriber/
+│       └── coquill-transcriber/
 │           └── SKILL.md              # Transcriber skill (interview transcript)
 ├── docs/                             # Documentation site (Astro Starlight)
 ├── tests/                            # Test/benchmark suite
@@ -41,13 +41,13 @@ codraft/
 
 ## Skills
 
-Codraft v2 uses four focused skills:
+CoQuill v2 uses four focused skills:
 
 | Skill | Purpose |
 |---|---|
-| **Orchestrator** (`.claude/skills/codraft/`) | Entry point. Matches user request to template, runs interview, confirms values, and triggers rendering. |
-| **Analyzer** (`.claude/skills/codraft-analyzer/`) | Parses the template for variables, conditionals, and loops. Generates `manifest.yaml`. Merges `config.yaml` overrides. |
-| **Renderer** (`.claude/skills/codraft-renderer/`) | Renders the template with collected values. Produces `.docx`, `.html` + `.pdf`, or `.md` + optional `.pdf`. Validates output for unfilled placeholders. |
-| **Transcriber** (`.claude/skills/codraft-transcriber/`) | Generates a human-readable `transcript.md` from the interview log after each document assembly session. |
+| **Orchestrator** (`.claude/skills/coquill/`) | Entry point. Matches user request to template, runs interview, confirms values, and triggers rendering. |
+| **Analyzer** (`.claude/skills/coquill-analyzer/`) | Parses the template for variables, conditionals, and loops. Generates `manifest.yaml`. Merges `config.yaml` overrides. |
+| **Renderer** (`.claude/skills/coquill-renderer/`) | Renders the template with collected values. Produces `.docx`, `.html` + `.pdf`, or `.md` + optional `.pdf`. Validates output for unfilled placeholders. |
+| **Transcriber** (`.claude/skills/coquill-transcriber/`) | Generates a human-readable `transcript.md` from the interview log after each document assembly session. |
 
 The Orchestrator is the only user-facing skill. The Analyzer, Renderer, and Transcriber are invoked by the Orchestrator.

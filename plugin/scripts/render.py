@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Codraft document renderer.
+"""CoQuill document renderer.
 
 Consolidates docx, html, and markdown rendering into a single CLI script.
 Reads a Jinja2-style template and a JSON context file, renders the document,
@@ -322,7 +322,7 @@ _RENDERERS = {
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Codraft document renderer — renders templates to docx/html/md with optional PDF."
+        description="CoQuill document renderer — renders templates to docx/html/md with optional PDF."
     )
     parser.add_argument(
         "--template",

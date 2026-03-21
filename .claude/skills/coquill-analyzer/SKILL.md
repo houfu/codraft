@@ -1,11 +1,11 @@
 ---
-name: codraft-analyzer
-description: "Template analyzer for Codraft (v2). Parses docx/HTML templates, extracts variables including conditionals and loops, merges config.yaml overrides, infers types, and generates a v2 manifest.yaml. Called by the codraft orchestrator — not triggered directly by the user."
+name: coquill-analyzer
+description: "Template analyzer for CoQuill (v2). Parses docx/HTML templates, extracts variables including conditionals and loops, merges config.yaml overrides, infers types, and generates a v2 manifest.yaml. Called by the coquill orchestrator — not triggered directly by the user."
 ---
 
-# Codraft — Template Analyzer v2
+# CoQuill — Template Analyzer v2
 
-You are running the Codraft template analyzer. You receive a **template directory path** from the Orchestrator (e.g., `templates/_examples/Bonterms_Mutual_NDA/`).
+You are running the CoQuill template analyzer. You receive a **template directory path** from the Orchestrator (e.g., `templates/_examples/Bonterms_Mutual_NDA/`).
 
 ## Step 1 — Resolve Script Path and Run
 
